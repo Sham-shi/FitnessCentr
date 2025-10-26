@@ -1,0 +1,105 @@
+﻿<UserControl
+    x:Class="FitnessCentrApp.Views.TrainersView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:FitnessCentrApp.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:FitnessCentrApp.ViewModels"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <UserControl.DataContext>
+        <vm:TrainersViewModel />
+    </UserControl.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="2*" />
+        </Grid.RowDefinitions>
+
+        <!--  Список тренеров  -->
+        <DataGrid
+            Grid.Row="0"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            IsReadOnly="False"
+            ItemsSource="{Binding Trainers}"
+            SelectedItem="{Binding SelectedTrainer}">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Binding="{Binding TrainerId}"
+                    Header="ID"
+                    IsReadOnly="True" />
+                <DataGridTextColumn Binding="{Binding FullName}" Header="ФИО" />
+                <DataGridTextColumn Binding="{Binding Phone}" Header="Телефон" />
+                <DataGridTextColumn Binding="{Binding Email}" Header="Email" />
+                <DataGridTextColumn Binding="{Binding Specialization}" Header="Специализация" />
+                <DataGridTextColumn Binding="{Binding Salary}" Header="Зарплата" />
+                <DataGridTextColumn
+                    Binding="{Binding Branch.BranchName}"
+                    Header="Филиал"
+                    IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!--  Добавление нового тренера  -->
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,10,0,0"
+            Orientation="Vertical">
+            <TextBox
+                Style="{StaticResource PlaceholderTextBoxStyle}"
+                Tag="ФИО"
+                Text="{Binding NewTrainer.FullName, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Style="{StaticResource PlaceholderTextBoxStyle}"
+                Tag="Телефон"
+                Text="{Binding NewTrainer.Phone, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Style="{StaticResource PlaceholderTextBoxStyle}"
+                Tag="Email"
+                Text="{Binding NewTrainer.Email, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Style="{StaticResource PlaceholderTextBoxStyle}"
+                Tag="Специализация"
+                Text="{Binding NewTrainer.Specialization, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
+                Style="{StaticResource PlaceholderTextBoxStyle}"
+                Tag="Зарплата"
+                Text="{Binding NewTrainer.Salary, UpdateSourceTrigger=PropertyChanged}" />
+
+            <ComboBox
+                Margin="0,5,0,5"
+                DisplayMemberPath="BranchName"
+                ToolTip="Филиал"
+                ItemsSource="{Binding Branches}"
+                SelectedValue="{Binding NewTrainer.BranchID}"
+                SelectedValuePath="BranchId" />
+
+            <StackPanel
+                Margin="0,5"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+                <Button
+                    Margin="5"
+                    Command="{Binding AddCommand}"
+                    Content="Добавить" />
+                <Button
+                    Margin="5"
+                    Command="{Binding UpdateCommand}"
+                    Content="Обновить" />
+                <Button
+                    Margin="5"
+                    Command="{Binding DeleteCommand}"
+                    Content="Удалить" />
+                <Button
+                    Margin="5"
+                    Command="{Binding RefreshCommand}"
+                    Content="Обновить список" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
