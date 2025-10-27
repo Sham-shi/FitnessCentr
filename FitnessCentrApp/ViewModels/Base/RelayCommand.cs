@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace FitnessCentrApp.ViewModels;
+namespace FitnessCentrApp.ViewModels.Base;
 
 public class RelayCommand : ICommand
 {

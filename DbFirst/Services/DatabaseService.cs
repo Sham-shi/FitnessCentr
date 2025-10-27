@@ -7,7 +7,7 @@ namespace DbFirst.Services;
 public static class DatabaseService
 {
     private static IConfigurationRoot? _configuration;
-    private static string _currentDb = "MSSQL"; // default
+    private static string _currentDb = "SQLite"; // default MSSQL
     private static string? _mssqlConn;
     private static string? _sqliteConn;
 
@@ -38,6 +38,7 @@ public static class DatabaseService
             if (string.IsNullOrWhiteSpace(_sqliteConn))
                 throw new InvalidOperationException("SQLite connection string is empty. Check appsettings.json.");
 
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FitnessCentr.db");
             // Если пользователь записал просто имя файла или относительный путь, нормализуем:
             var conn = NormalizeSqliteConnectionString(_sqliteConn);
             System.Diagnostics.Debug.WriteLine($"CurrentDb: {_currentDb}");

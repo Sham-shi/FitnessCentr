@@ -13,6 +13,7 @@ namespace DbFirst.Models;
 public partial class Branch
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int BranchID { get; set; }
 
     [Required]

@@ -11,6 +11,7 @@ namespace DbFirst.Models;
 public partial class Service
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ServiceID { get; set; }
 
     [Required]

@@ -13,6 +13,7 @@ namespace DbFirst.Models;
 public partial class Trainer
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int TrainerID { get; set; }
 
     public int BranchID { get; set; }

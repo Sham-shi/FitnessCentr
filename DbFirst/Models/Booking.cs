@@ -11,6 +11,7 @@ namespace DbFirst.Models;
 public partial class Booking
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int BookingID { get; set; }
 
     public int ClientID { get; set; }

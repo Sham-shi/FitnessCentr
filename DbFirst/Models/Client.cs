@@ -13,6 +13,7 @@ namespace DbFirst.Models;
 public partial class Client
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ClientID { get; set; }
 
     [Required]

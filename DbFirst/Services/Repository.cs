@@ -10,11 +10,19 @@ public class Repository<T> where T : class
         return ctx.Set<T>().AsNoTracking().ToList();
     }
 
-    public void Add(T entity)
+    //public void Add(T entity)
+    //{
+    //    using var ctx = DatabaseService.CreateContext();
+    //    ctx.Set<T>().Add(entity);
+    //    ctx.SaveChanges();
+    //}
+    public T Add(T entity)
     {
         using var ctx = DatabaseService.CreateContext();
+        //ctx.Entry(entity).Property("BranchID").IsTemporary = true;
         ctx.Set<T>().Add(entity);
-        ctx.SaveChanges();
+        ctx.SaveChanges(); // EF обновит entity.BranchID после этого вызова
+        return entity;     // возвращаем тот же объект с заполненным ID
     }
 
     public void Update(T entity)

@@ -25,10 +25,10 @@ namespace FitnessCentrApp
             DatabaseService.Initialize(config);
 
             // По умолчанию можно использовать SQLite (меньше проблем с сертификатами)
-            //DatabaseService.UseDatabase("SQLite");
+            DatabaseService.UseDatabase("SQLite");
 
             // Или если хочешь MSSQL:
-            DatabaseService.UseDatabase("MSSQL");
+            //DatabaseService.UseDatabase("MSSQL");
         }
     }
 
