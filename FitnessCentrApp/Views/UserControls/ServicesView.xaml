@@ -24,7 +24,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Binding="{Binding ServiceID}"
-                    Header="Id"
+                    Header="ID"
                     IsReadOnly="True" />
                 <DataGridTextColumn
                     Binding="{Binding ServiceName}"

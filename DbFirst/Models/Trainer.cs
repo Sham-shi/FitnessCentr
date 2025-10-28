@@ -17,40 +17,50 @@ public partial class Trainer
     [Display(Name = "ID")]
     public int TrainerID { get; set; }
 
+    [Display(Name = "ID филиала")]
     public int BranchID { get; set; }
 
     [Required]
     [StringLength(100)]
+    [Display(Name = "ФИО")]
     public string FullName { get; set; }
 
     [Required]
     [StringLength(20)]
+    [Display(Name = "Телефон")]
     public string Phone { get; set; }
 
     [Required]
     [StringLength(100)]
+    [Display(Name = "Email")]
     public string Email { get; set; }
 
     [Required]
     [StringLength(100)]
+    [Display(Name = "Специализация")]
     public string Specialization { get; set; }
 
     [Required]
     [StringLength(500)]
+    [Display(Name = "Образование")]
     public string Education { get; set; }
 
     [Required]
     [StringLength(1000)]
+    [Display(Name = "Опыт работы")]
     public string WorkExperience { get; set; }
 
     [Required]
     [StringLength(1000)]
+    [Display(Name = "Достижения")]
     public string SportsAchievements { get; set; }
 
     [Column(TypeName = "decimal(10, 2)")]
+    [Display(Name = "Зарплата")]
     public decimal Salary { get; set; }
 
     [StringLength(500)]
+    [Display(Name = "Фото")]
     public string PhotoPath { get; set; }
 
     [InverseProperty("Trainer")]

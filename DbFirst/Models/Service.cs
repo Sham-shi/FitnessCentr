@@ -17,20 +17,26 @@ public partial class Service
 
     [Required]
     [StringLength(100)]
+    [Display(Name = "Название")]
     public string ServiceName { get; set; }
 
     [Required]
     [StringLength(50)]
+    [Display(Name = "Тип услуги")]
     public string ServiceType { get; set; }
 
+    [Display(Name = "Продолжительность, мин")]
     public int DurationMinutes { get; set; }
 
+    [Display(Name = "Макс. кол-во участников")]
     public int? MaxParticipants { get; set; }
 
     [Column(TypeName = "decimal(10, 2)")]
+    [Display(Name = "Цена")]
     public decimal BasePrice { get; set; }
 
     [StringLength(500)]
+    [Display(Name = "Описание")]
     public string Description { get; set; }
 
     [InverseProperty("Service")]

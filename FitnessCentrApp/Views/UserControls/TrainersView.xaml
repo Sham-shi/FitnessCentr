@@ -31,7 +31,7 @@
                     IsReadOnly="True" />
                 <DataGridTextColumn
                     Binding="{Binding BranchID}"
-                    Header="Филиал ID"
+                    Header="ID филиала"
                     IsReadOnly="False" />
                 <DataGridTextColumn
                     Binding="{Binding FullName}"
@@ -77,24 +77,6 @@
             Grid.Row="1"
             Margin="0,10,0,0"
             Orientation="Vertical">
-            <!--<TextBox
-                Text="{Binding NewTrainer.FullName, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBox
-                Text="{Binding NewTrainer.Phone, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBox
-                Text="{Binding NewTrainer.Email, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBox
-                Text="{Binding NewTrainer.Specialization, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBox
-                Text="{Binding NewTrainer.Salary, UpdateSourceTrigger=PropertyChanged}" />
-
-            <ComboBox
-                Margin="0,5,0,5"
-                DisplayMemberPath="BranchName"
-                ToolTip="Филиал"
-                ItemsSource="{Binding Branches}"
-                SelectedValue="{Binding NewTrainer.BranchID}"
-                SelectedValuePath="BranchId" />-->
 
             <StackPanel
                 Margin="0,5"

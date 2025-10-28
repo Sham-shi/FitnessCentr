@@ -29,7 +29,7 @@
             <Button Content="Сохранить" Command="{Binding SaveCommand}" Margin="5"/>
             <Button Content="Сохранить изменения" Command="{Binding UpdateCommand}" Margin="5"/>
             <Button Content="Удалить" Command="{Binding DeleteCommand}" Margin="5"/>
-            <Button Content="Обновить таблицу" Command="{Binding RefreshCommand}" Margin="150 5 5 5"/>
+            <Button Content="Обновить список" Command="{Binding RefreshCommand}" Margin="150 5 5 5"/>
         </StackPanel>
     </Grid>
 </UserControl>

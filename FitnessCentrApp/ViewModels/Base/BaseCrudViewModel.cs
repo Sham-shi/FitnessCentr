@@ -5,8 +5,15 @@ using System.Windows;
 
 namespace FitnessCentrApp.ViewModels.Base;
 
-public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new()
+public interface IEditableViewModel
 {
+    event Action<object> BeginEditRequested;
+}
+
+public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel where T : class, new()
+{
+    public event Action<object>? BeginEditRequested;
+
     protected readonly Repository<T> _repo = new();
 
     private T? _selectedItem;
@@ -26,6 +33,17 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
         set
         {
             _isReadOnly = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private T? _editableItem;
+    public T? EditableItem
+    {
+        get => _editableItem;
+        set
+        {
+            _editableItem = value;
             OnPropertyChanged();
         }
     }
@@ -67,7 +85,9 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
         {
             _repo.Add(SelectedItem);
             Refresh();
+
             IsReadOnly = true; // снова делаем только для чтения
+            EditableItem = null; // снимаем режим редактирования
 
             MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -86,7 +106,9 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
         {
             _repo.Update(SelectedItem);
             Refresh();
+
             IsReadOnly = true;
+            EditableItem = null; // снимаем режим редактирования
         }
         catch (Exception ex)
         {
@@ -102,7 +124,11 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
             return;
         }
 
+        EditableItem = SelectedItem; // запоминаем, что можно редактировать только этот объект
         IsReadOnly = false; // разрешаем редактирование
+
+        // сигнал для View, что нужно начать редактирование
+        BeginEditRequested?.Invoke(SelectedItem);
     }
 
     protected virtual void DeleteItem()
@@ -130,5 +156,8 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
         Items.Clear();
         foreach (var item in _repo.GetAll())
             Items.Add(item);
+
+        IsReadOnly = true;
+        EditableItem = null;
     }
 }

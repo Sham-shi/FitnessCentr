@@ -19,17 +19,22 @@ public partial class Client
 
     [Required]
     [StringLength(100)]
+    [Display(Name = "ФИО")]
     public string FullName { get; set; }
 
     [Required]
     [StringLength(20)]
+    [Display(Name = "Телефон")]
     public string Phone { get; set; }
 
     [StringLength(100)]
+    [Display(Name = "Email")]
     public string Email { get; set; }
 
+    [Display(Name = "День рождения")]
     public DateOnly? BirthDate { get; set; }
 
+    [Display(Name = "Дата регистрации")]
     public DateOnly RegistrationDate { get; set; }
 
     [InverseProperty("Client")]
