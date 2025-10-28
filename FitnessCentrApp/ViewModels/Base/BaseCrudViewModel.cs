@@ -19,10 +19,21 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
         set { _selectedItem = value; OnPropertyChanged(); }
     }
 
+    private bool _isReadOnly = true;
+    public bool IsReadOnly
+    {
+        get => _isReadOnly;
+        set
+        {
+            _isReadOnly = value;
+            OnPropertyChanged();
+        }
+    }
+
     // Команды
+    public RelayCommand EditCommand { get; }
     public RelayCommand CreateCommand { get; }
     public RelayCommand SaveCommand { get; }
-    //public RelayCommand AddCommand { get; }
     public RelayCommand UpdateCommand { get; }
     public RelayCommand DeleteCommand { get; }
     public RelayCommand RefreshCommand { get; }
@@ -31,41 +42,20 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
     {
         Items = new ObservableCollection<T>(_repo.GetAll());
 
+        EditCommand = new RelayCommand(_ => EditItem(), _ => SelectedItem != null);
         CreateCommand = new RelayCommand(_ => CreateNewItem());
         SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => SelectedItem != null);
-        //AddCommand = new RelayCommand(_ => AddItem());
         UpdateCommand = new RelayCommand(_ => UpdateItem(), _ => SelectedItem != null);
         DeleteCommand = new RelayCommand(_ => DeleteItem(), _ => SelectedItem != null);
         RefreshCommand = new RelayCommand(_ => Refresh());
     }
-
-    //protected virtual void AddItem()
-    //{
-    //    //if (NewItem is Branch b && b.BranchID == 0)
-    //    //    b.BranchID = 0; // гарантируем, что EF не воспримет его как вручную заданный
-
-    //    //// добавляем и получаем объект с реальным ID
-    //    //var added = _repo.Add(NewItem);
-
-    //    //// добавляем его в коллекцию, чтобы DataGrid сразу отобразил новую запись
-    //    //Items.Add(added);
-
-    //    //// выбираем добавленный элемент, если нужно
-    //    //SelectedItem = added;
-
-    //    //// очищаем форму для следующего ввода
-    //    //NewItem = new T();
-
-    //    _repo.Add(SelectedItem);
-    //    Items.Add(SelectedItem);
-    //    Refresh();
-    //}
 
     protected virtual void CreateNewItem()
     {
         var item = new T();
         Items.Add(item);
         SelectedItem = item;
+        IsReadOnly = false;
     }
 
     protected virtual void SaveSelectedItem()
@@ -77,6 +67,9 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
         {
             _repo.Add(SelectedItem);
             Refresh();
+            IsReadOnly = true; // снова делаем только для чтения
+
+            MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
@@ -93,11 +86,23 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel where T : class, new(
         {
             _repo.Update(SelectedItem);
             Refresh();
+            IsReadOnly = true;
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Ошибка при обновлении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    protected virtual void EditItem()
+    {
+        if (SelectedItem == null)
+        {
+            MessageBox.Show("Сначала выберите элемент для редактирования.");
+            return;
+        }
+
+        IsReadOnly = false; // разрешаем редактирование
     }
 
     protected virtual void DeleteItem()

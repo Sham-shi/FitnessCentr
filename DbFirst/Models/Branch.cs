@@ -14,22 +14,27 @@ public partial class Branch
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Display(Name = "ID")]
     public int BranchID { get; set; }
 
     [Required]
     [StringLength(100)]
+    [Display(Name = "Филиал")]
     public string BranchName { get; set; }
 
     [Required]
     [StringLength(200)]
+    [Display(Name = "Адрес")]
     public string Address { get; set; }
 
     [Required]
     [StringLength(20)]
+    [Display(Name = "Телефон")]
     public string Phone { get; set; }
 
     [Required]
     [StringLength(100)]
+    [Display(Name = "Email")]
     public string Email { get; set; }
 
     [InverseProperty("Branch")]

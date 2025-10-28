@@ -12,6 +12,7 @@ public partial class Service
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Display(Name = "ID")]
     public int ServiceID { get; set; }
 
     [Required]

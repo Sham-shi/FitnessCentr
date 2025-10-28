@@ -23,13 +23,12 @@ namespace FitnessCentrApp.Views.UserControls;
 /// </summary>
 public partial class BranchesView : UserControl
 {
-    private BranchesViewModel viewModel = new();
     //private Repository<Branch> repository = new Repository<Branch>();
     public BranchesView()
     {
         InitializeComponent();
 
-        DataContext = viewModel;
+        DataContext = new BranchesViewModel();
         //repository.Add(new Branch { BranchName = "Test", Address = "Addr", Phone = "123", Email = "a@a.com" });
         //_repo.Add(new Branch { BranchName = "Test", Address = "Addr", Phone = "123", Email = "a@a.com" });
     }

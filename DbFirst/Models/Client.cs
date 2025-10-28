@@ -14,6 +14,7 @@ public partial class Client
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Display(Name = "ID")]
     public int ClientID { get; set; }
 
     [Required]

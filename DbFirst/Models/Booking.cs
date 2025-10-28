@@ -12,6 +12,7 @@ public partial class Booking
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Display(Name = "ID")]
     public int BookingID { get; set; }
 
     public int ClientID { get; set; }

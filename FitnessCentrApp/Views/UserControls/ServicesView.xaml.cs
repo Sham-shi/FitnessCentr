@@ -8,11 +8,10 @@ namespace FitnessCentrApp.Views.UserControls;
 /// </summary>
 public partial class ServicesView : UserControl
 {
-    private ServicesViewModel viewModel = new();
     public ServicesView()
     {
         InitializeComponent();
 
-        DataContext = viewModel;
+        DataContext = new ServicesViewModel();
     }
 }
