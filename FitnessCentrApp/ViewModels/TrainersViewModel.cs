@@ -16,7 +16,7 @@ namespace FitnessCentrApp.ViewModels
 
         public ObservableCollection<Trainer> Trainers => Items;
 
-        public ObservableCollection<Branch> Branches { get; set; }
+        public ObservableCollection<Branch> Branches { get; private set; }
 
         public Trainer? SelectedTrainer
         {

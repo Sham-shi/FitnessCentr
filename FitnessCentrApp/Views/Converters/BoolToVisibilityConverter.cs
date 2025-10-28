@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace FitnessCentrApp.Converters;
+namespace FitnessCentrApp.Views.Converters;
 
 public class BoolToVisibilityConverter : IValueConverter
 {

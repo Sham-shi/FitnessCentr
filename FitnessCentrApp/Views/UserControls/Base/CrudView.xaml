@@ -2,7 +2,7 @@
     x:Class="FitnessCentrApp.Views.UserControls.Base.CrudView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:conv="clr-namespace:FitnessCentrApp.Converters"
+    xmlns:conv="clr-namespace:FitnessCentrApp.Views.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
@@ -10,9 +10,6 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <!--<UserControl.Resources>
-        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-    </UserControl.Resources>-->
     <UserControl.Resources>
         <conv:ItemEqualsConverter x:Key="ItemEqualsConverter" />
     </UserControl.Resources>
@@ -23,21 +20,6 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <!--  🔶 Индикатор режима редактирования  -->
-        <!--<Border
-            Grid.Row="0"
-            Margin="0,0,0,10"
-            Padding="8"
-            Background="Gold"
-            CornerRadius="5"
-            Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
-            <TextBlock
-                HorizontalAlignment="Center"
-                FontWeight="Bold"
-                Foreground="Black"
-                Text="Режим редактирования активен" />
-        </Border>-->
 
         <!--  DataGrid  -->
         <DataGrid
@@ -50,27 +32,7 @@
             IsReadOnly="{Binding IsReadOnly}"
             ItemsSource="{Binding Items}"
             SelectedItem="{Binding SelectedItem}"
-            LoadingRow="DataGridAuto_LoadingRow">
-
-            <DataGrid.Resources>
-                <Style TargetType="DataGridRow">
-                    <Style.Triggers>
-                        <!-- Если текущая строка равна EditableItem, триггер сработает -->
-                        <DataTrigger Value="True">
-                            <DataTrigger.Binding>
-                                <MultiBinding Converter="{StaticResource ItemEqualsConverter}">
-                                    <!-- Первый биндинг: текущая строка (DataContext строки) -->
-                                    <Binding />
-                                    <!-- Второй биндинг: EditableItem из DataContext DataGrid (т.е. VM) -->
-                                    <Binding Path="DataContext.EditableItem" RelativeSource="{RelativeSource AncestorType=DataGrid}" />
-                                </MultiBinding>
-                            </DataTrigger.Binding>
-                            <Setter Property="Background" Value="#FFFCE4B3"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.Resources>
-        </DataGrid>
+            LoadingRow="DataGridAuto_LoadingRow"/>
 
         <!--  Кнопки  -->
         <StackPanel

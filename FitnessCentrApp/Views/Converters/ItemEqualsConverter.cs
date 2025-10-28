@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace FitnessCentrApp.Converters;
+namespace FitnessCentrApp.Views.Converters;
 
 public class ItemEqualsConverter : IMultiValueConverter
 {
