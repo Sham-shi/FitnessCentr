@@ -8,12 +8,11 @@ namespace FitnessCentrApp.ViewModels.Base;
 public interface IEditableViewModel
 {
     event Action<object> BeginEditRequested;
+    object? EditableItem { get; }
 }
 
 public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel where T : class, new()
 {
-    public event Action<object>? BeginEditRequested;
-
     protected readonly Repository<T> _repo = new();
 
     private T? _selectedItem;
@@ -47,6 +46,10 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel w
             OnPropertyChanged();
         }
     }
+
+    // Реализация интерфейса
+    object? IEditableViewModel.EditableItem => EditableItem;
+    public event Action<object>? BeginEditRequested;
 
     // Команды
     public RelayCommand EditCommand { get; }

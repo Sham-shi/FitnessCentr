@@ -1,35 +1,113 @@
-﻿<UserControl x:Class="FitnessCentrApp.Views.UserControls.Base.CrudView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+﻿<UserControl
+    x:Class="FitnessCentrApp.Views.UserControls.Base.CrudView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:FitnessCentrApp.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <!--<UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>-->
+    <UserControl.Resources>
+        <conv:ItemEqualsConverter x:Key="ItemEqualsConverter" />
+    </UserControl.Resources>
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- DataGrid -->
-        <DataGrid x:Name="DataGridAuto"
-                  ItemsSource="{Binding Items}"
-                  SelectedItem="{Binding SelectedItem}"
-                  AutoGenerateColumns="True"
-                  IsReadOnly="{Binding IsReadOnly}"
-                  CanUserAddRows="False"
-                  AutoGeneratingColumn="DataGridAuto_AutoGeneratingColumn"
-                  BeginningEdit="DataGridAuto_BeginningEdit"/>
+        <!--  🔶 Индикатор режима редактирования  -->
+        <!--<Border
+            Grid.Row="0"
+            Margin="0,0,0,10"
+            Padding="8"
+            Background="Gold"
+            CornerRadius="5"
+            Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontWeight="Bold"
+                Foreground="Black"
+                Text="Режим редактирования активен" />
+        </Border>-->
 
-        <!-- Кнопки -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
-            <Button Name="CteateButton" Content="Создать" Command="{Binding CreateCommand}" Margin="5"/>
-            <Button Name="EditButton" Content="Редактировать" Command="{Binding EditCommand}" Margin="5"/>
-            <Button Name="SaveButton" Content="Сохранить" Command="{Binding SaveCommand}" Margin="5"/>
-            <Button Name="UpdateButton" Content="Сохранить изменения" Command="{Binding UpdateCommand}" Margin="5"/>
-            <Button Name="DeleteButton" Content="Удалить" Command="{Binding DeleteCommand}" Margin="5"/>
-            <Button Name="RefreshButton" Content="Обновить список" Command="{Binding RefreshCommand}" Margin="150 5 5 5"/>
+        <!--  DataGrid  -->
+        <DataGrid
+            x:Name="DataGridAuto"
+            Grid.Row="1"
+            AutoGenerateColumns="True"
+            AutoGeneratingColumn="DataGridAuto_AutoGeneratingColumn"
+            BeginningEdit="DataGridAuto_BeginningEdit"
+            CanUserAddRows="False"
+            IsReadOnly="{Binding IsReadOnly}"
+            ItemsSource="{Binding Items}"
+            SelectedItem="{Binding SelectedItem}"
+            LoadingRow="DataGridAuto_LoadingRow">
+
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <!-- Если текущая строка равна EditableItem, триггер сработает -->
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource ItemEqualsConverter}">
+                                    <!-- Первый биндинг: текущая строка (DataContext строки) -->
+                                    <Binding />
+                                    <!-- Второй биндинг: EditableItem из DataContext DataGrid (т.е. VM) -->
+                                    <Binding Path="DataContext.EditableItem" RelativeSource="{RelativeSource AncestorType=DataGrid}" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter Property="Background" Value="#FFFCE4B3"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+        </DataGrid>
+
+        <!--  Кнопки  -->
+        <StackPanel
+            Grid.Row="2"
+            Margin="0,10,0,0"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Button
+                Name="CteateButton"
+                Margin="5"
+                Command="{Binding CreateCommand}"
+                Content="Создать" />
+            <Button
+                Name="EditButton"
+                Margin="5"
+                Command="{Binding EditCommand}"
+                Content="Редактировать" />
+            <Button
+                Name="SaveButton"
+                Margin="5"
+                Command="{Binding SaveCommand}"
+                Content="Сохранить" />
+            <Button
+                Name="UpdateButton"
+                Margin="5"
+                Command="{Binding UpdateCommand}"
+                Content="Сохранить изменения" />
+            <Button
+                Name="DeleteButton"
+                Margin="5"
+                Command="{Binding DeleteCommand}"
+                Content="Удалить" />
+            <Button
+                Name="RefreshButton"
+                Margin="150,5,5,5"
+                Command="{Binding RefreshCommand}"
+                Content="Обновить список" />
         </StackPanel>
     </Grid>
 </UserControl>

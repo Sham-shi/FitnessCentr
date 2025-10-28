@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FitnessCentrApp.Views.UserControls.Base;
 
@@ -18,6 +19,9 @@ public partial class CrudView : UserControl
             {
                 vm.BeginEditRequested += OnBeginEditRequested;
             }
+
+            // Подключаем обработчик кликов по строкам
+            DataGridAuto.LoadingRow += DataGridAuto_LoadingRow;
         };
     }
 
@@ -35,7 +39,9 @@ public partial class CrudView : UserControl
         // Если первая колонка не редактируемая (например, ID), пропускаем её
         //var editableColumn = DataGridAuto.Columns.ElementAtOrDefault(1); // вторая колонка (индекс 1)
         var editableColumn = DataGridAuto.Columns
-            .SkipWhile(c => c.IsReadOnly || c.Header?.ToString()?.Contains("ID", StringComparison.OrdinalIgnoreCase) == true)
+            .SkipWhile(c =>
+                c.IsReadOnly ||
+                c.Header?.ToString()?.Contains("ID", StringComparison.OrdinalIgnoreCase) == true)
             .FirstOrDefault();
 
         if (editableColumn == null)
@@ -47,8 +53,69 @@ public partial class CrudView : UserControl
         // Начинаем редактирование
         DataGridAuto.BeginEdit();
 
+        // Пытаемся сфокусироваться на активной ячейке
+        if (DataGridAuto.CurrentCell.Column?.GetCellContent(row)?.Parent is DataGridCell cell)
+        {
+            cell.Focus();
+        }
+
         // Перемещаем фокус в редактируемую ячейку
         //row.MoveFocus(new System.Windows.Input.TraversalRequest(System.Windows.Input.FocusNavigationDirection.Next)); // не работает
+    }
+
+    private void DataGridAuto_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+    {
+        if (DataContext is not BaseCrudViewModel<object> vm)
+            return;
+
+        var item = e.Row.Item;
+
+        // Если редактирование запрещено вообще
+        if (vm.IsReadOnly)
+        {
+            e.Cancel = true;
+            return;
+        }
+
+        // Разрешаем редактировать только тот элемент, который был выбран при нажатии "Редактировать"
+        if (!Equals(item, vm.EditableItem))
+        {
+            e.Cancel = true;
+        }
+    }
+
+    private void DataGridAuto_LoadingRow(object sender, DataGridRowEventArgs e)
+    {
+        // Подключаем событие к каждой строке
+        e.Row.PreviewMouseLeftButtonDown -= DataGridRow_PreviewMouseLeftButtonDown;
+        e.Row.PreviewMouseLeftButtonDown += DataGridRow_PreviewMouseLeftButtonDown;
+    }
+
+    private void DataGridRow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is not IEditableViewModel vm)
+            return;
+
+        if (vm.EditableItem == null)
+            return;
+
+        if (sender is not DataGridRow row)
+            return;
+
+        var clickedItem = row.Item;
+
+        // если клик по другой строке во время редактирования — блокируем
+        if (!Equals(clickedItem, vm.EditableItem))
+        {
+            e.Handled = true;
+
+            //// Можно просто молча игнорировать, либо показать сообщение
+            //MessageBox.Show(
+            //    "Завершите редактирование текущей строки перед переходом к другой.",
+            //    "Редактирование заблокировано",
+            //    MessageBoxButton.OK,
+            //    MessageBoxImage.Information);
+        }
     }
 
     private void DataGridAuto_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -98,26 +165,5 @@ public partial class CrudView : UserControl
             || underlyingType == typeof(DateTime)
             || underlyingType == typeof(Guid)
             || underlyingType == typeof(TimeSpan);
-    }
-
-    private void DataGridAuto_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-    {
-        if (DataContext is not BaseCrudViewModel<object> vm)
-            return;
-
-        var item = e.Row.Item;
-
-        // Если редактирование запрещено вообще
-        if (vm.IsReadOnly)
-        {
-            e.Cancel = true;
-            return;
-        }
-
-        // Разрешаем редактировать только тот элемент, который был выбран при нажатии "Редактировать"
-        if (!Equals(item, vm.EditableItem))
-        {
-            e.Cancel = true;
-        }
     }
 }
