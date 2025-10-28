@@ -84,6 +84,11 @@ namespace FitnessCentrApp.ViewModels
             {
                 _repo.Add(SelectedTrainer);
                 Refresh();
+
+
+                IsReadOnly = true; // снова делаем только для чтения
+                EditableItem = null; // снимаем режим редактирования
+
                 MessageBox.Show("Тренер успешно добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)

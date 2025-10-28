@@ -6,9 +6,6 @@ using System.Windows.Controls;
 
 namespace FitnessCentrApp.Views.UserControls.Base;
 
-/// <summary>
-/// Логика взаимодействия для CrudView.xaml
-/// </summary>
 public partial class CrudView : UserControl
 {
     public CrudView()
@@ -34,8 +31,9 @@ public partial class CrudView : UserControl
             return;
         }
 
-        // 🔹 Находим первую редактируемую колонку (не IsReadOnly)
-        //    Если первая колонка не редактируемая (например, ID), пропускаем её
+        // Находим первую редактируемую колонку (не IsReadOnly)
+        // Если первая колонка не редактируемая (например, ID), пропускаем её
+        //var editableColumn = DataGridAuto.Columns.ElementAtOrDefault(1); // вторая колонка (индекс 1)
         var editableColumn = DataGridAuto.Columns
             .SkipWhile(c => c.IsReadOnly || c.Header?.ToString()?.Contains("ID", StringComparison.OrdinalIgnoreCase) == true)
             .FirstOrDefault();
@@ -55,31 +53,56 @@ public partial class CrudView : UserControl
 
     private void DataGridAuto_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-        var property = e.PropertyDescriptor as System.ComponentModel.PropertyDescriptor;
+        var type = e.PropertyType;
+        var property = e.PropertyDescriptor as PropertyDescriptor;
         if (property == null) return;
 
-        if (typeof(IEnumerable).IsAssignableFrom(e.PropertyType) && e.PropertyType != typeof(string))
+        // Пропускаем коллекции (IEnumerable, кроме string)
+        if (typeof(IEnumerable).IsAssignableFrom(e.PropertyType) && type != typeof(string))
         {
             e.Cancel = true;
             return;
         }
 
+        // Пропускаем навигационные свойства (ссылки на другие сущности)
+        // то есть типы, которые не являются простыми
+        if (!IsSimpleType(type))
+        {
+            e.Cancel = true;
+            return;
+        }
+
+        // Если есть атрибут [Display(Name = "...")] — ставим красивое имя
         var displayAttr = property.Attributes.OfType<DisplayAttribute>().FirstOrDefault();
         if (displayAttr != null)
         {
             e.Column.Header = displayAttr.Name;
         }
 
-        // скрыть ID колонку, если нужно
+        // Делаем ID только для чтения
         if (e.PropertyName.EndsWith("ID", StringComparison.OrdinalIgnoreCase))
         {
             e.Column.IsReadOnly = true; //e.Cancel = true; // или закомментируй, если хочешь показывать
         }
     }
 
+    // Проверяет, является ли тип простым (int, string, decimal, DateTime и т.п.)
+    private bool IsSimpleType(Type type)
+    {
+        var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
+
+        return underlyingType.IsPrimitive
+            || underlyingType.IsEnum
+            || underlyingType == typeof(string)
+            || underlyingType == typeof(decimal)
+            || underlyingType == typeof(DateTime)
+            || underlyingType == typeof(Guid)
+            || underlyingType == typeof(TimeSpan);
+    }
+
     private void DataGridAuto_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
     {
-        if (DataContext is not FitnessCentrApp.ViewModels.Base.BaseCrudViewModel<object> vm)
+        if (DataContext is not BaseCrudViewModel<object> vm)
             return;
 
         var item = e.Row.Item;

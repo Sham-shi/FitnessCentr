@@ -15,26 +15,35 @@ public partial class Booking
     [Display(Name = "ID")]
     public int BookingID { get; set; }
 
+    [Display(Name = "ID клиента")]
     public int ClientID { get; set; }
 
+    [Display(Name = "ID услуги")]
     public int ServiceID { get; set; }
 
+    [Display(Name = "ID тренера")]
     public int TrainerID { get; set; }
 
+    [Display(Name = "Дата занятия")]
     public DateTime BookingDateTime { get; set; }
 
+    [Display(Name = "Кол-во занятий")]
     public int SessionsCount { get; set; }
 
     [Column(TypeName = "decimal(10, 2)")]
+    [Display(Name = "Общая стоимость")]
     public decimal TotalPrice { get; set; }
 
     [Required]
     [StringLength(20)]
+    [Display(Name = "Статус")]
     public string Status { get; set; }
 
     [StringLength(500)]
+    [Display(Name = "Комментарии")]
     public string Notes { get; set; }
 
+    [Display(Name = "Дата записи")]
     public DateTime CreatedDate { get; set; }
 
     [ForeignKey("ClientID")]

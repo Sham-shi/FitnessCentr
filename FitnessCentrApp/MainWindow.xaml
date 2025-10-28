@@ -42,6 +42,13 @@
                     </views:CrudView.DataContext>
                 </views:CrudView>
             </TabItem>
+            <TabItem Name="BookingsTab" Header="Записи" >
+                <views:CrudView>
+                    <views:CrudView.DataContext>
+                        <vm:BookingsViewModel />
+                    </views:CrudView.DataContext>
+                </views:CrudView>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
