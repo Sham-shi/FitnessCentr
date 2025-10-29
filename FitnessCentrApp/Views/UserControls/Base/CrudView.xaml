@@ -12,6 +12,16 @@
 
     <UserControl.Resources>
         <conv:ItemEqualsConverter x:Key="ItemEqualsConverter" />
+        <!-- Стиль для подсветки ошибок -->
+        <Style TargetType="DataGridCell">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip"
+                    Value="{Binding (Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"/>
+                    <Setter Property="Background" Value="#FFFFD6D6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="10">
@@ -31,8 +41,8 @@
             CanUserAddRows="False"
             IsReadOnly="{Binding IsReadOnly}"
             ItemsSource="{Binding Items}"
-            SelectedItem="{Binding SelectedItem}"
-            LoadingRow="DataGridAuto_LoadingRow"/>
+            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+            LoadingRow="DataGridAuto_LoadingRow" />
 
         <!--  Кнопки  -->
         <StackPanel

@@ -1,10 +1,10 @@
 ﻿using DbFirst.Models;
 using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base;
+using FitnessCentrApp.ViewModels.Base.Models;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -12,13 +12,12 @@ namespace FitnessCentrApp.ViewModels
 {
     public class TrainersViewModel : BaseCrudViewModel<Trainer>
     {
+        private readonly Repository<Trainer> _trainerRepo = new();
         private readonly Repository<Branch> _branchesRepo = new();
 
-        public ObservableCollection<Trainer> Trainers => Items;
+        public ObservableCollection<Branch> Branches { get; }
 
-        public ObservableCollection<Branch> Branches { get; private set; }
-
-        public Trainer? SelectedTrainer
+        public TrainerViewModel? SelectedTrainer
         {
             get => SelectedItem;
             set
@@ -37,58 +36,45 @@ namespace FitnessCentrApp.ViewModels
         {
             Branches = new ObservableCollection<Branch>(_branchesRepo.GetAll());
             SelectPhotoCommand = new RelayCommand(_ => SelectPhoto());
+            Refresh();
         }
 
-        /// <summary>
-        /// Создать нового тренера (пока не добавляется в БД)
-        /// </summary>
+        protected override void Refresh()
+        {
+            Items.Clear();
+            foreach (var trainer in _trainerRepo.GetAll())
+                Items.Add(new TrainerViewModel(trainer));
+
+            IsReadOnly = true;
+            EditableItem = null;
+            OnPropertyChanged(nameof(SelectedPhoto));
+        }
+
         protected override void CreateNewItem()
         {
-            var trainer = new Trainer
-            {
-                FullName = "",
-                Phone = "",
-                Email = "",
-                Education = "",
-                WorkExperience = "",
-                SportsAchievements = "",
-                Specialization = "",
-                Salary = 0,
-                BranchID = Branches.FirstOrDefault()?.BranchID ?? 1,
-                PhotoPath = ""
-            };
-
-            Items.Add(trainer);
-            SelectedTrainer = trainer;
+            var vm = new TrainerViewModel();
+            Items.Add(vm);
+            SelectedTrainer = vm;
+            IsReadOnly = false;
+            EditableItem = vm;
         }
 
-        /// <summary>
-        /// Сохранить выбранного тренера в БД
-        /// </summary>
         protected override void SaveSelectedItem()
         {
             if (SelectedTrainer == null)
                 return;
 
-            // Проверяем обязательные поля
-            if (string.IsNullOrWhiteSpace(SelectedTrainer.FullName) ||
-                string.IsNullOrWhiteSpace(SelectedTrainer.Phone) ||
-                string.IsNullOrWhiteSpace(SelectedTrainer.Email))
+            SelectedTrainer.ValidateAll();
+            if (SelectedTrainer.HasErrors)
             {
-                MessageBox.Show("Поля ФИО, Телефон и Email обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Исправьте ошибки перед сохранением.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
-                _repo.Add(SelectedTrainer);
+                _trainerRepo.Add(SelectedTrainer.Model);
                 Refresh();
-
-
-                IsReadOnly = true; // снова делаем только для чтения
-                EditableItem = null; // снимаем режим редактирования
-
                 MessageBox.Show("Тренер успешно добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -101,8 +87,7 @@ namespace FitnessCentrApp.ViewModels
         {
             if (SelectedTrainer == null)
             {
-                MessageBox.Show("Выберите тренера для добавления фотографии.", "Информация",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Выберите тренера для добавления фотографии.");
                 return;
             }
 
@@ -151,12 +136,6 @@ namespace FitnessCentrApp.ViewModels
             {
                 return null;
             }
-        }
-
-        protected override void Refresh()
-        {
-            base.Refresh();
-            OnPropertyChanged(nameof(SelectedPhoto));
         }
     }
 }

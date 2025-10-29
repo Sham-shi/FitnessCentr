@@ -151,6 +151,18 @@ public partial class CrudView : UserControl
 
     private void DataGridAuto_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
     {
+        // Если колонка является DataGridBoundColumn — включаем валидацию на биндинге
+        if (e.Column is DataGridBoundColumn boundColumn)
+        {
+            if (boundColumn.Binding is Binding binding)
+            {
+                binding.ValidatesOnDataErrors = true;            // использовать INotifyDataErrorInfo / DataAnnotations
+                binding.NotifyOnValidationError = true;
+                binding.ValidatesOnExceptions = true;           // опционально — ловить исключения при преобразовании
+                binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged; // чтобы валидация работала сразу
+            }
+        }
+
         if (e.PropertyDescriptor is not PropertyDescriptor property)
             return;
 
@@ -240,8 +252,15 @@ public partial class CrudView : UserControl
         comboFactory.SetBinding(ComboBox.ItemsSourceProperty, itemsBinding);
         comboFactory.SetValue(ComboBox.DisplayMemberPathProperty, displayMember);
         comboFactory.SetValue(ComboBox.SelectedValuePathProperty, $"{relatedName}ID");
-        comboFactory.SetBinding(ComboBox.SelectedValueProperty,
-            new Binding(propName) { Mode = BindingMode.TwoWay });
+
+        var selectedValueBinding = new Binding(propName)
+        {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+            ValidatesOnDataErrors = true,
+            NotifyOnValidationError = true
+        };
+        comboFactory.SetBinding(ComboBox.SelectedValueProperty, selectedValueBinding);
 
         comboFactory.SetBinding(ComboBox.IsEnabledProperty, new Binding("IsReadOnly")
         {
