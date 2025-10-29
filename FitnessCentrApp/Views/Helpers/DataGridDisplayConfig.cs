@@ -19,19 +19,6 @@ public static class DataGridDisplayConfig
         { "Service", "ServiceName" }
     };
 
-    public static bool IsSimpleType(Type type)
-    {
-        var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
-
-        return underlyingType.IsPrimitive
-            || underlyingType.IsEnum
-            || underlyingType == typeof(string)
-            || underlyingType == typeof(decimal)
-            || underlyingType == typeof(DateTime)
-            || underlyingType == typeof(Guid)
-            || underlyingType == typeof(TimeSpan);
-    }
-
     public static string ToPlural(string word)
     {
         if (string.IsNullOrWhiteSpace(word))
@@ -124,7 +111,7 @@ public static class DataGridDisplayConfig
     public static DataGridColumn CreateForeignKeyColumn(Type modelType, string propName, object? dataContext)
     {
         var relatedName = propName.Replace("ID", "");
-        var collectionName = DataGridDisplayConfig.ToPlural(relatedName);
+        var collectionName = ToPlural(relatedName);
 
         // fallback, если коллекция не найдена
         if (dataContext?.GetType().GetProperty(collectionName) == null)
@@ -135,7 +122,7 @@ public static class DataGridDisplayConfig
             return new DataGridTextColumn { Binding = new Binding(propName), Header = relatedName };
 
         var relatedType = navProp.PropertyType;
-        var displayMember = DataGridDisplayConfig.GetDisplayMemberName(relatedType);
+        var displayMember = GetDisplayMemberName(relatedType);
 
         var comboColumn = new DataGridTemplateColumn
         {
@@ -187,11 +174,25 @@ public static class DataGridDisplayConfig
     public static bool ShouldSkipColumn(Type type)
     {
         return (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
-            || !DataGridDisplayConfig.IsSimpleType(type);
+            || !IsSimpleType(type);
     }
 
     public static bool IsPrimaryKey(string typeName, string propName)
     {
         return string.Equals(propName, $"{typeName}ID", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool IsSimpleType(Type type)
+    {
+        var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
+
+        return underlyingType.IsPrimitive
+            || underlyingType.IsEnum
+            || underlyingType == typeof(string)
+            || underlyingType == typeof(decimal)
+            || underlyingType == typeof(DateTime)
+            || underlyingType == typeof(Guid)
+            || underlyingType == typeof(TimeSpan)
+            || underlyingType == typeof(DateOnly);
     }
 }

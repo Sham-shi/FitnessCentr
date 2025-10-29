@@ -41,9 +41,9 @@ public static class DatabaseService
             string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FitnessCentr.db");
             // Если пользователь записал просто имя файла или относительный путь, нормализуем:
             var conn = NormalizeSqliteConnectionString(_sqliteConn);
-            System.Diagnostics.Debug.WriteLine($"CurrentDb: {_currentDb}");
-            System.Diagnostics.Debug.WriteLine($"MSSQL Conn: {_mssqlConn}");
-            System.Diagnostics.Debug.WriteLine($"SQLite Conn: {_sqliteConn}");
+            //System.Diagnostics.Debug.WriteLine($"CurrentDb: {_currentDb}");
+            //System.Diagnostics.Debug.WriteLine($"MSSQL Conn: {_mssqlConn}");
+            //System.Diagnostics.Debug.WriteLine($"SQLite Conn: {_sqliteConn}");
             optionsBuilder.UseSqlite(conn);
         }
         else // MSSQL
@@ -51,9 +51,9 @@ public static class DatabaseService
             if (string.IsNullOrWhiteSpace(_mssqlConn))
                 throw new InvalidOperationException("MSSQL connection string is empty. Check appsettings.json.");
 
-            System.Diagnostics.Debug.WriteLine($"CurrentDb: {_currentDb}");
-            System.Diagnostics.Debug.WriteLine($"MSSQL Conn: {_mssqlConn}");
-            System.Diagnostics.Debug.WriteLine($"SQLite Conn: {_sqliteConn}");
+            //System.Diagnostics.Debug.WriteLine($"CurrentDb: {_currentDb}");
+            //System.Diagnostics.Debug.WriteLine($"MSSQL Conn: {_mssqlConn}");
+            //System.Diagnostics.Debug.WriteLine($"SQLite Conn: {_sqliteConn}");
             optionsBuilder.UseSqlServer(_mssqlConn);
         }
 

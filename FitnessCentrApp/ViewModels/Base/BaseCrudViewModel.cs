@@ -76,7 +76,12 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel w
         var item = new T();
         Items.Add(item);
         SelectedItem = item;
-        IsReadOnly = false;
+
+        EditableItem = SelectedItem; // запоминаем, что можно редактировать только этот объект
+        IsReadOnly = false; // разрешаем редактирование
+
+        // сигнал для View, что нужно начать редактирование
+        BeginEditRequested?.Invoke(SelectedItem);
     }
 
     protected virtual void SaveSelectedItem()

@@ -2,6 +2,7 @@
 using FitnessCentrApp.Views.Helpers;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FitnessCentrApp.Views.UserControls.Base;
@@ -173,6 +174,22 @@ public partial class CrudView : UserControl
         if (propName.EndsWith("ID", StringComparison.OrdinalIgnoreCase))
         {
             e.Column = DataGridDisplayConfig.CreateForeignKeyColumn(modelType, propName, DataContext);
+        }
+
+        if (type == typeof(DateTime) || type == typeof(DateTime?))
+        {
+            (e.Column as DataGridTextColumn).Binding = new Binding(e.PropertyName)
+            {
+                StringFormat = "dd.MM.yyyy HH:mm"
+            };
+        }
+
+        if (type == typeof(DateOnly) || type == typeof(DateOnly?))
+        {
+            (e.Column as DataGridTextColumn).Binding = new Binding(e.PropertyName)
+            {
+                StringFormat = "dd.MM.yyyy"
+            };
         }
     }
 }
