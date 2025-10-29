@@ -1,12 +1,7 @@
 ﻿using FitnessCentrApp.ViewModels.Base;
-using FitnessCentrApp.Views.Converters;
 using FitnessCentrApp.Views.Helpers;
-using System.Collections;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FitnessCentrApp.Views.UserControls.Base;
@@ -58,10 +53,10 @@ public partial class CrudView : UserControl
             foreach (var column in DataGridAuto.Columns)
             {
                 // Получаем ширину по содержимому
-                var cellWidth = DisplayConfig.GetActualColumnContentWidth(DataGridAuto, column);
+                var cellWidth = DataGridDisplayConfig.GetActualColumnContentWidth(DataGridAuto, column);
 
                 // Получаем ширину заголовка
-                var headerWidth = DisplayConfig.GetHeaderActualWidth(DataGridAuto, column);
+                var headerWidth = DataGridDisplayConfig.GetHeaderActualWidth(DataGridAuto, column);
 
                 // Берём максимальную из двух
                 var finalWidth = Math.Max(cellWidth, headerWidth);
@@ -155,21 +150,20 @@ public partial class CrudView : UserControl
             return;
 
         var type = e.PropertyType;
-
-        if (ShouldSkipColumn(type))
+        if (DataGridDisplayConfig.ShouldSkipColumn(type))
         {
             e.Cancel = true;
             return;
         }
 
-        ApplyDisplayName(property, e);
+        DataGridDisplayConfig.ApplyDisplayName(property, e);
 
         var modelType = property.ComponentType;
         var typeName = modelType.Name;
         var propName = e.PropertyName;
 
         // Первичный ключ
-        if (IsPrimaryKey(typeName, propName))
+        if (DataGridDisplayConfig.IsPrimaryKey(typeName, propName))
         {
             e.Column.IsReadOnly = true;
             return;
@@ -178,103 +172,7 @@ public partial class CrudView : UserControl
         // Внешний ключ → создаём ComboBox
         if (propName.EndsWith("ID", StringComparison.OrdinalIgnoreCase))
         {
-            e.Column = CreateForeignKeyColumn(modelType, propName, DataContext);
-        }
-        else
-        {
-            // Для обычных колонок добавляем валидацию
-            if (e.Column is DataGridBoundColumn boundColumn)
-            {
-                // Создаем binding с валидацией
-                var binding = (Binding)boundColumn.Binding;
-                binding.ValidatesOnDataErrors = true;
-                binding.NotifyOnValidationError = true;
-                binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            }
-        }
-    }
-
-    private static bool ShouldSkipColumn(Type type)
-    {
-        return (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
-            || !DisplayConfig.IsSimpleType(type);
-    }
-
-    private static void ApplyDisplayName(PropertyDescriptor property, DataGridAutoGeneratingColumnEventArgs e)
-    {
-        var displayAttr = property.Attributes.OfType<DisplayAttribute>().FirstOrDefault();
-        if (displayAttr != null)
-        {
-            e.Column.Header = displayAttr.Name;
-        }
-    }
-
-    private static bool IsPrimaryKey(string typeName, string propName)
-    {
-        return string.Equals(propName, $"{typeName}ID", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static DataGridColumn CreateForeignKeyColumn(Type modelType, string propName, object? dataContext)
-    {
-        var relatedName = propName.Replace("ID", "");
-        var collectionName = DisplayConfig.ToPlural(relatedName);
-
-        // fallback, если коллекция не найдена
-        if (dataContext?.GetType().GetProperty(collectionName) == null)
-            collectionName = relatedName;
-
-        var navProp = modelType.GetProperty(relatedName);
-        if (navProp == null)
-            return new DataGridTextColumn { Binding = new Binding(propName), Header = relatedName };
-
-        var relatedType = navProp.PropertyType;
-        var displayMember = DisplayConfig.GetDisplayMemberName(relatedType);
-
-        var comboColumn = new DataGridTemplateColumn
-        {
-            Header = relatedName
-        };
-
-        // обычный режим — ID
-        var cellTemplate = new DataTemplate();
-        var textFactory = new FrameworkElementFactory(typeof(TextBlock));
-        textFactory.SetBinding(TextBlock.TextProperty, new Binding(propName));
-        cellTemplate.VisualTree = textFactory;
-        comboColumn.CellTemplate = cellTemplate;
-
-        // режим редактирования — ComboBox
-        var editTemplate = new DataTemplate();
-        var comboFactory = new FrameworkElementFactory(typeof(ComboBox));
-
-        var itemsBinding = new Binding($"DataContext.{collectionName}")
-        {
-            RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGrid), 1)
-        };
-        comboFactory.SetBinding(ComboBox.ItemsSourceProperty, itemsBinding);
-        comboFactory.SetValue(ComboBox.DisplayMemberPathProperty, displayMember);
-        comboFactory.SetValue(ComboBox.SelectedValuePathProperty, $"{relatedName}ID");
-        comboFactory.SetBinding(ComboBox.SelectedValueProperty,
-            new Binding(propName) { Mode = BindingMode.TwoWay });
-
-        comboFactory.SetBinding(ComboBox.IsEnabledProperty, new Binding("IsReadOnly")
-        {
-            RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGrid), 1),
-            Converter = new InverseBooleanConverter()
-        });
-
-        editTemplate.VisualTree = comboFactory;
-        comboColumn.CellEditingTemplate = editTemplate;
-
-        return comboColumn;
-    }
-
-    private void DataGridAuto_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-    {
-        if (e.EditAction == DataGridEditAction.Commit && DataContext is ValidatableViewModel vm)
-        {
-            // Обновляем валидацию после редактирования ячейки
-            var editedItem = e.Row.Item;
-            // Здесь можно вызвать валидацию для измененного свойства
+            e.Column = DataGridDisplayConfig.CreateForeignKeyColumn(modelType, propName, DataContext);
         }
     }
 }

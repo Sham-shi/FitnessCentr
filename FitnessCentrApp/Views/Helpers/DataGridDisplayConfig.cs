@@ -1,10 +1,15 @@
-﻿using System.Windows;
+﻿using FitnessCentrApp.Views.Converters;
+using System.Collections;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace FitnessCentrApp.Views.Helpers;
 
-public static class DisplayConfig
+public static class DataGridDisplayConfig
 {
     public static readonly Dictionary<string, string> DisplayOverrides = new()
     {
@@ -114,5 +119,79 @@ public static class DisplayConfig
         {
             return 0;
         }
+    }
+
+    public static DataGridColumn CreateForeignKeyColumn(Type modelType, string propName, object? dataContext)
+    {
+        var relatedName = propName.Replace("ID", "");
+        var collectionName = DataGridDisplayConfig.ToPlural(relatedName);
+
+        // fallback, если коллекция не найдена
+        if (dataContext?.GetType().GetProperty(collectionName) == null)
+            collectionName = relatedName;
+
+        var navProp = modelType.GetProperty(relatedName);
+        if (navProp == null)
+            return new DataGridTextColumn { Binding = new Binding(propName), Header = relatedName };
+
+        var relatedType = navProp.PropertyType;
+        var displayMember = DataGridDisplayConfig.GetDisplayMemberName(relatedType);
+
+        var comboColumn = new DataGridTemplateColumn
+        {
+            Header = relatedName
+        };
+
+        // обычный режим — ID
+        var cellTemplate = new DataTemplate();
+        var textFactory = new FrameworkElementFactory(typeof(TextBlock));
+        textFactory.SetBinding(TextBlock.TextProperty, new Binding(propName));
+        cellTemplate.VisualTree = textFactory;
+        comboColumn.CellTemplate = cellTemplate;
+
+        // режим редактирования — ComboBox
+        var editTemplate = new DataTemplate();
+        var comboFactory = new FrameworkElementFactory(typeof(ComboBox));
+
+        var itemsBinding = new Binding($"DataContext.{collectionName}")
+        {
+            RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGrid), 1)
+        };
+        comboFactory.SetBinding(ComboBox.ItemsSourceProperty, itemsBinding);
+        comboFactory.SetValue(ComboBox.DisplayMemberPathProperty, displayMember);
+        comboFactory.SetValue(ComboBox.SelectedValuePathProperty, $"{relatedName}ID");
+        comboFactory.SetBinding(ComboBox.SelectedValueProperty,
+            new Binding(propName) { Mode = BindingMode.TwoWay });
+
+        comboFactory.SetBinding(ComboBox.IsEnabledProperty, new Binding("IsReadOnly")
+        {
+            RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGrid), 1),
+            Converter = new InverseBooleanConverter()
+        });
+
+        editTemplate.VisualTree = comboFactory;
+        comboColumn.CellEditingTemplate = editTemplate;
+
+        return comboColumn;
+    }
+
+    public static void ApplyDisplayName(PropertyDescriptor property, DataGridAutoGeneratingColumnEventArgs e)
+    {
+        var displayAttr = property.Attributes.OfType<DisplayAttribute>().FirstOrDefault();
+        if (displayAttr != null)
+        {
+            e.Column.Header = displayAttr.Name;
+        }
+    }
+
+    public static bool ShouldSkipColumn(Type type)
+    {
+        return (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
+            || !DataGridDisplayConfig.IsSimpleType(type);
+    }
+
+    public static bool IsPrimaryKey(string typeName, string propName)
+    {
+        return string.Equals(propName, $"{typeName}ID", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -12,39 +12,12 @@
 
     <UserControl.Resources>
         <conv:ItemEqualsConverter x:Key="ItemEqualsConverter" />
-        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        
-        <Style x:Key="ErrorTextBoxStyle" TargetType="TextBox">
-            <Style.Triggers>
-                <Trigger Property="Validation.HasError" Value="True">
-                    <Setter Property="ToolTip" 
-                            Value="{Binding RelativeSource={RelativeSource Self}, 
-                                   Path=(Validation.Errors)[0].ErrorContent}"/>
-                    <Setter Property="Background" Value="LightPink"/>
-                    <Setter Property="BorderBrush" Value="Red"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для DataGrid с валидацией -->
-        <Style x:Key="ValidatableDataGridCellStyle" TargetType="DataGridCell">
-            <Style.Triggers>
-                <Trigger Property="Validation.HasError" Value="True">
-                    <Setter Property="ToolTip" 
-                            Value="{Binding RelativeSource={RelativeSource Self}, 
-                                   Path=(Validation.Errors)[0].ErrorContent}"/>
-                    <Setter Property="Background" Value="LightPink"/>
-                    <Setter Property="BorderBrush" Value="Red"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
     </UserControl.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -58,10 +31,8 @@
             CanUserAddRows="False"
             IsReadOnly="{Binding IsReadOnly}"
             ItemsSource="{Binding Items}"
-            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-            LoadingRow="DataGridAuto_LoadingRow"
-            CellStyle="{StaticResource ValidatableDataGridCellStyle}"
-            CellEditEnding="DataGridAuto_CellEditEnding"/>
+            SelectedItem="{Binding SelectedItem}"
+            LoadingRow="DataGridAuto_LoadingRow"/>
 
         <!--  Кнопки  -->
         <StackPanel
@@ -83,13 +54,11 @@
                 Name="SaveButton"
                 Margin="5"
                 Command="{Binding SaveCommand}"
-                IsEnabled="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}"
                 Content="Сохранить" />
             <Button
                 Name="UpdateButton"
                 Margin="5"
                 Command="{Binding UpdateCommand}"
-                IsEnabled="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=inverse}"
                 Content="Сохранить изменения" />
             <Button
                 Name="DeleteButton"
@@ -102,10 +71,5 @@
                 Command="{Binding RefreshCommand}"
                 Content="Обновить список" />
         </StackPanel>
-        
-        <!-- Статус валидации (альтернативный вариант) -->
-        <TextBlock Grid.Row="3" Text="{Binding Error}" Foreground="Red" TextWrapping="Wrap" 
-                   Margin="0,5,0,0"
-                   Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

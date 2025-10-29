@@ -11,13 +11,14 @@ public interface IEditableViewModel
     object? EditableItem { get; }
 }
 
-public abstract class BaseCrudViewModel<T> : ValidatableViewModel, IEditableViewModel where T : class, new()
+public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel where T : class, new()
 {
     protected readonly Repository<T> _repo = new();
 
+    private T? _selectedItem;
+
     public ObservableCollection<T> Items { get; set; }
 
-    private T? _selectedItem;
     public T? SelectedItem
     {
         get => _selectedItem;
@@ -64,8 +65,8 @@ public abstract class BaseCrudViewModel<T> : ValidatableViewModel, IEditableView
 
         EditCommand = new RelayCommand(_ => EditItem(), _ => SelectedItem != null);
         CreateCommand = new RelayCommand(_ => CreateNewItem());
-        SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => SelectedItem != null && !HasErrors);
-        UpdateCommand = new RelayCommand(_ => UpdateItem(), _ => SelectedItem != null && !HasErrors);
+        SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => SelectedItem != null);
+        UpdateCommand = new RelayCommand(_ => UpdateItem(), _ => SelectedItem != null);
         DeleteCommand = new RelayCommand(_ => DeleteItem(), _ => SelectedItem != null);
         RefreshCommand = new RelayCommand(_ => Refresh());
     }
@@ -76,20 +77,12 @@ public abstract class BaseCrudViewModel<T> : ValidatableViewModel, IEditableView
         Items.Add(item);
         SelectedItem = item;
         IsReadOnly = false;
-        ClearErrors();
     }
 
     protected virtual void SaveSelectedItem()
     {
         if (SelectedItem == null)
             return;
-
-        if (HasErrors)
-        {
-            MessageBox.Show("Исправьте ошибки валидации перед сохранением.", "Ошибка валидации",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
 
         try
         {
@@ -112,13 +105,6 @@ public abstract class BaseCrudViewModel<T> : ValidatableViewModel, IEditableView
         if (SelectedItem == null)
             return;
 
-        if (HasErrors)
-        {
-            MessageBox.Show("Исправьте ошибки валидации перед обновлением.", "Ошибка валидации",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
         try
         {
             _repo.Update(SelectedItem);
@@ -126,8 +112,6 @@ public abstract class BaseCrudViewModel<T> : ValidatableViewModel, IEditableView
 
             IsReadOnly = true;
             EditableItem = null; // снимаем режим редактирования
-
-            MessageBox.Show("Изменения обновлены!", "Обновление", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
@@ -145,7 +129,6 @@ public abstract class BaseCrudViewModel<T> : ValidatableViewModel, IEditableView
 
         EditableItem = SelectedItem; // запоминаем, что можно редактировать только этот объект
         IsReadOnly = false; // разрешаем редактирование
-        ClearErrors();
 
         // сигнал для View, что нужно начать редактирование
         BeginEditRequested?.Invoke(SelectedItem);
@@ -179,6 +162,5 @@ public abstract class BaseCrudViewModel<T> : ValidatableViewModel, IEditableView
 
         IsReadOnly = true;
         EditableItem = null;
-        ClearErrors();
     }
 }
