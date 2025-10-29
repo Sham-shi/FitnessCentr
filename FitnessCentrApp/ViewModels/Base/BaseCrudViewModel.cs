@@ -1,17 +1,12 @@
 ﻿using DbFirst.Models;
 using DbFirst.Services;
+using FitnessCentrApp.ViewModels.Base.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace FitnessCentrApp.ViewModels.Base;
 
-public interface IEditableViewModel
-{
-    event Action<object> BeginEditRequested;
-    object? EditableItem { get; }
-}
-
-public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel where T : class, new()
+public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, ICheckableViewModel where T : class, new()
 {
     protected readonly Repository<T> _repo = new();
 
@@ -76,22 +71,17 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel w
         var item = new T();
         Items.Add(item);
         SelectedItem = item;
-
-        EditableItem = SelectedItem; // запоминаем, что можно редактировать только этот объект
-        IsReadOnly = false; // разрешаем редактирование
-
-        // сигнал для View, что нужно начать редактирование
-        BeginEditRequested?.Invoke(SelectedItem);
+        IsReadOnly = false;
     }
 
     protected virtual void SaveSelectedItem()
     {
-        if (SelectedItem == null)
+        if (EditableItem == null)
             return;
 
         try
         {
-            _repo.Add(SelectedItem);
+            _repo.Add(EditableItem);
             Refresh();
 
             IsReadOnly = true; // снова делаем только для чтения
@@ -107,12 +97,12 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel w
 
     protected virtual void UpdateItem()
     {
-        if (SelectedItem == null)
+        if (EditableItem == null)
             return;
 
         try
         {
-            _repo.Update(SelectedItem);
+            _repo.Update(EditableItem);
             Refresh();
 
             IsReadOnly = true;
@@ -167,5 +157,10 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel w
 
         IsReadOnly = true;
         EditableItem = null;
+    }
+
+    public virtual bool CheckFilling()
+    {
+        throw new NotImplementedException();
     }
 }

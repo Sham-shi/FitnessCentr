@@ -70,30 +70,41 @@ namespace FitnessCentrApp.ViewModels
                 return;
 
             // Проверяем обязательные поля
-            if (string.IsNullOrWhiteSpace(SelectedTrainer.FullName) ||
-                string.IsNullOrWhiteSpace(SelectedTrainer.Phone) ||
-                string.IsNullOrWhiteSpace(SelectedTrainer.Email))
+            if (CheckFilling())
             {
-                MessageBox.Show("Поля ФИО, Телефон и Email обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Для заполнения обязательны все поля, кроме Зарплата и Фото.",
+                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            try
+            base.SaveSelectedItem();
+        }
+
+        public override bool CheckFilling()
+        {
+            return (string.IsNullOrWhiteSpace(SelectedTrainer.FullName) ||
+                    string.IsNullOrWhiteSpace(SelectedTrainer.Phone) ||
+                    string.IsNullOrWhiteSpace(SelectedTrainer.Email) ||
+                    string.IsNullOrWhiteSpace(SelectedTrainer.Specialization) ||
+                    string.IsNullOrWhiteSpace(SelectedTrainer.Education) ||
+                    string.IsNullOrWhiteSpace(SelectedTrainer.WorkExperience) ||
+                    string.IsNullOrWhiteSpace(SelectedTrainer.SportsAchievements));
+        }
+
+        protected override void UpdateItem()
+        {
+            if (SelectedTrainer == null)
+                return;
+
+            // Проверяем обязательные поля
+            if (CheckFilling())
             {
-                _repo.Add(SelectedTrainer);
-                Refresh();
-
-
-                IsReadOnly = true; // снова делаем только для чтения
-                EditableItem = null; // снимаем режим редактирования
-
-                MessageBox.Show("Тренер успешно добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Для заполнения обязательны все поля, кроме Зарплата и Фото.",
+                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при добавлении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+
+            base.UpdateItem();
         }
 
         private void SelectPhoto()

@@ -1,4 +1,5 @@
 ﻿using FitnessCentrApp.ViewModels.Base;
+using FitnessCentrApp.ViewModels.Base.Interfaces;
 using FitnessCentrApp.Views.Helpers;
 using System.ComponentModel;
 using System.Windows.Controls;

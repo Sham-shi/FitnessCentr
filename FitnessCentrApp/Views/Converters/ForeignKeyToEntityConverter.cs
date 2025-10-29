@@ -7,7 +7,7 @@ namespace FitnessCentrApp.Views.Converters;
 public class ForeignKeyToEntityConverter : IValueConverter
 {
     /// <summary>
-    /// Преобразует навигационное свойство (Branch) в ID для ComboBox.
+    /// Преобразует навигационное свойство в ID для ComboBox.
     /// </summary>
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -20,7 +20,7 @@ public class ForeignKeyToEntityConverter : IValueConverter
     }
 
     /// <summary>
-    /// При выборе нового ID в ComboBox ищет соответствующий объект Branch и возвращает его.
+    /// При выборе нового ID в ComboBox ищет соответствующий объекти возвращает его.
     /// </summary>
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
