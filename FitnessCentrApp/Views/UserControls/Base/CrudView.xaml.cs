@@ -218,5 +218,16 @@ public partial class CrudView : UserControl
             };
             (e.Column as DataGridTextColumn).Binding = binding;
         }
+
+        if (propName.Equals("PhotoPath", StringComparison.OrdinalIgnoreCase))
+        {
+            // Создаем DataGridTemplateColumn для кастомного отображения/редактирования
+            e.Column = DataGridDisplayConfig.CreatePhotoPathColumn(DataContext, propName);
+
+            // Применяем заголовок из атрибута [Display]
+            DataGridDisplayConfig.ApplyDisplayName(property, e);
+
+            return; // Завершаем обработку для этого столбца
+        }
     }
 }

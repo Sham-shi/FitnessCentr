@@ -79,7 +79,7 @@ namespace FitnessCentrApp.ViewModels
 
         private void SelectPhoto()
         {
-            if (SelectedTrainer == null)
+            if (EditableItem is not Trainer trainer)
             {
                 MessageBox.Show("Выберите тренера для добавления фотографии.", "Информация",
                     MessageBoxButton.OK, MessageBoxImage.Information);
@@ -98,12 +98,21 @@ namespace FitnessCentrApp.ViewModels
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
 
-                // --- Создаем уникальное имя файла ---
-                var fileExtension = Path.GetExtension(dlg.FileName);
-                // Используем GUID для уникальности
-                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                // --- 1. Извлекаем части имени файла ---
+                var fullPath = dlg.FileName;
+                var originalFileName = Path.GetFileNameWithoutExtension(fullPath); // "моя_фотка"
+                var fileExtension = Path.GetExtension(fullPath);                   // ".jpg"
+
+                // --- 2. Создаем уникальный суффикс (короткий таймстамп) ---
+                // Формат: "_yyyyMMddHHmmss" или "_ddMMyy_hhmmss"
+                var uniqueSuffix = DateTime.Now.ToString("_yyyyMMddHHmmss");
+
+                // --- 3. Формируем новое уникальное имя файла ---
+                // Пример: "моя_фотка_20251101123638.jpg"
+                var uniqueFileName = $"{originalFileName}{uniqueSuffix}{fileExtension}";
+
+                // --- 4. Создаем путь назначения и копируем файл ---
                 var destPath = Path.Combine(folder, uniqueFileName);
-                // ------------------------------------------------
 
                 try
                 {
