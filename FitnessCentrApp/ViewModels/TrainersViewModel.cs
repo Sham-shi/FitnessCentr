@@ -11,8 +11,6 @@ namespace FitnessCentrApp.ViewModels
 {
     public class TrainersViewModel : BaseCrudViewModel<Trainer>
     {
-        //private readonly Repository<Branch> _branchesRepo = new();
-
         public ObservableCollection<Trainer> Trainers => Items;
 
         public ObservableCollection<Branch> Branches { get; private set; }

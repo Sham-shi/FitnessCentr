@@ -45,11 +45,13 @@
                 Name="CteateButton"
                 Margin="5"
                 Command="{Binding CreateCommand}"
+                IsEnabled="{Binding IsSEditEnabled}"
                 Content="Создать" />
             <Button
                 Name="EditButton"
                 Margin="5"
                 Command="{Binding EditCommand}"
+                IsEnabled="{Binding IsSEditEnabled}"
                 Content="Редактировать" />
             <Button
                 Name="SaveButton"
@@ -67,6 +69,7 @@
                 Name="DeleteButton"
                 Margin="5"
                 Command="{Binding DeleteCommand}"
+                IsEnabled="{Binding IsSEditEnabled}"
                 Content="Удалить" />
             <Button
                 Name="RefreshButton"

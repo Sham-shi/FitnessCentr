@@ -41,6 +41,17 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         }
     }
 
+    private bool _isEditEnabled = true;
+    public bool IsSEditEnabled
+    {
+        get => _isEditEnabled;
+        set
+        {
+            _isEditEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
     private T? _editableItem;
     public T? EditableItem
     {
@@ -83,6 +94,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         EditableItem = SelectedItem;
         IsReadOnly = false;
         IsSaveEnabled = true;
+        IsSEditEnabled = false;
 
         // 2. Добавляем элемент в коллекцию (начинается асинхронная отрисовка)
         Items.Add(SelectedItem);
@@ -110,12 +122,11 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
 
             ctx.SaveChanges();
 
-            //_repo.Save(EditableItem);
             Refresh();
 
-            IsReadOnly = true; // снова делаем только для чтения
-            EditableItem = null; // снимаем режим редактирования
-            IsSaveEnabled = false;
+            //IsReadOnly = true; // снова делаем только для чтения
+            //EditableItem = null; // снимаем режим редактирования
+            //IsSaveEnabled = false;
 
             MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -187,6 +198,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         EditableItem = SelectedItem; // запоминаем, что можно редактировать только этот объект
         IsReadOnly = false; // разрешаем редактирование
         IsSaveEnabled = true;
+        IsSEditEnabled = false;
 
         // сигнал для View, что нужно начать редактирование
         BeginEditRequested?.Invoke(SelectedItem);
@@ -206,7 +218,6 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
                 ctx.Set<T>().Remove(SelectedItem);
                 ctx.SaveChanges();
 
-                //_repo.Delete(SelectedItem);
                 Refresh();
             }
             catch (Exception ex)
@@ -229,6 +240,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         IsReadOnly = true;
         EditableItem = null;
         IsSaveEnabled = false;
+        IsSEditEnabled = true;
     }
 
     public virtual bool CheckFilling()
