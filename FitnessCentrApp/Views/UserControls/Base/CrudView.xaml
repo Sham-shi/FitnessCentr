@@ -55,12 +55,14 @@
                 Name="SaveButton"
                 Margin="5"
                 Command="{Binding SaveCommand}"
+                IsEnabled="{Binding IsSaveEnabled}"
                 Content="Сохранить" />
             <Button
-                Name="UpdateButton"
+                Name="CancelButton"
                 Margin="5"
-                Command="{Binding UpdateCommand}"
-                Content="Сохранить изменения" />
+                Command="{Binding RefreshCommand}"
+                IsEnabled="{Binding IsSaveEnabled}"
+                Content="Отменить" />
             <Button
                 Name="DeleteButton"
                 Margin="5"

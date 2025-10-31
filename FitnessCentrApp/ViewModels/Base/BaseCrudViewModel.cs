@@ -10,10 +10,9 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
 {
     protected readonly Repository<T> _repo = new();
 
-    private T? _selectedItem;
-
     public ObservableCollection<T> Items { get; set; }
 
+    private T? _selectedItem;
     public T? SelectedItem
     {
         get => _selectedItem;
@@ -27,6 +26,28 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         set
         {
             _isReadOnly = value;
+            OnPropertyChanged();
+        }
+    }
+
+    //private bool _isUpdateEnabled = false;
+    //public bool IsUpdateEnabled
+    //{
+    //    get => _isUpdateEnabled;
+    //    set
+    //    {
+    //        _isUpdateEnabled = value;
+    //        OnPropertyChanged();
+    //    }
+    //}
+
+    private bool _isSaveEnabled = false;
+    public bool IsSaveEnabled
+    {
+        get => _isSaveEnabled;
+        set
+        {
+            _isSaveEnabled = value;
             OnPropertyChanged();
         }
     }
@@ -50,7 +71,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
     public RelayCommand EditCommand { get; }
     public RelayCommand CreateCommand { get; }
     public RelayCommand SaveCommand { get; }
-    public RelayCommand UpdateCommand { get; }
+    //public RelayCommand UpdateCommand { get; }
     public RelayCommand DeleteCommand { get; }
     public RelayCommand RefreshCommand { get; }
 
@@ -61,17 +82,14 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         EditCommand = new RelayCommand(_ => EditItem(), _ => SelectedItem != null);
         CreateCommand = new RelayCommand(_ => CreateNewItem());
         SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => SelectedItem != null);
-        UpdateCommand = new RelayCommand(_ => UpdateItem(), _ => SelectedItem != null);
+        //UpdateCommand = new RelayCommand(_ => UpdateItem(), _ => SelectedItem != null);
         DeleteCommand = new RelayCommand(_ => DeleteItem(), _ => SelectedItem != null);
         RefreshCommand = new RelayCommand(_ => Refresh());
     }
 
     protected virtual void CreateNewItem()
     {
-        var item = new T();
-        Items.Add(item);
-        SelectedItem = item;
-        IsReadOnly = false;
+        // логика у каждого своя
     }
 
     protected virtual void SaveSelectedItem()
@@ -81,11 +99,12 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
 
         try
         {
-            _repo.Add(EditableItem);
+            _repo.Save(EditableItem);
             Refresh();
 
             IsReadOnly = true; // снова делаем только для чтения
             EditableItem = null; // снимаем режим редактирования
+            IsSaveEnabled = false;
 
             MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -95,24 +114,27 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         }
     }
 
-    protected virtual void UpdateItem()
-    {
-        if (EditableItem == null)
-            return;
+    //protected virtual void UpdateItem()
+    //{
+    //    if (EditableItem == null)
+    //        return;
 
-        try
-        {
-            _repo.Update(EditableItem);
-            Refresh();
+    //    try
+    //    {
+    //        _repo.Update(EditableItem);
+    //        Refresh();
 
-            IsReadOnly = true;
-            EditableItem = null; // снимаем режим редактирования
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ошибка при обновлении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
+    //        IsReadOnly = true;
+    //        EditableItem = null; // снимаем режим редактирования
+    //        IsUpdateEnabled = false;
+
+    //        MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        MessageBox.Show($"Ошибка при обновлении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+    //    }
+    //}
 
     protected virtual void EditItem()
     {
@@ -124,6 +146,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
 
         EditableItem = SelectedItem; // запоминаем, что можно редактировать только этот объект
         IsReadOnly = false; // разрешаем редактирование
+        IsSaveEnabled = true;
 
         // сигнал для View, что нужно начать редактирование
         BeginEditRequested?.Invoke(SelectedItem);
@@ -157,6 +180,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
 
         IsReadOnly = true;
         EditableItem = null;
+        IsSaveEnabled = false;
     }
 
     public virtual bool CheckFilling()

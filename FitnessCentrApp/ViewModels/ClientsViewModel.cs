@@ -22,8 +22,8 @@ public class ClientsViewModel : BaseCrudViewModel<Client>
             FullName = "",
             Phone = "",
             Email = "",
-            BirthDate = DateOnly.MinValue,
-            RegistrationDate = DateOnly.MinValue
+            BirthDate = DateOnly.FromDateTime(DateTime.Now),
+            RegistrationDate = DateOnly.FromDateTime(DateTime.Now)
         };
 
         Items.Add(client);
@@ -52,19 +52,19 @@ public class ClientsViewModel : BaseCrudViewModel<Client>
         base.SaveSelectedItem();
     }
 
-    protected override void UpdateItem()
-    {
-        if (SelectedClient == null)
-            return;
+    //protected override void UpdateItem()
+    //{
+    //    if (SelectedClient == null)
+    //        return;
 
-        // Проверяем обязательные поля
-        if (CheckFilling())
-        {
-            MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+    //    // Проверяем обязательные поля
+    //    if (CheckFilling())
+    //    {
+    //        MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
+    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+    //        return;
+    //    }
 
-        base.UpdateItem();
-    }
+    //    base.UpdateItem();
+    //}
 }

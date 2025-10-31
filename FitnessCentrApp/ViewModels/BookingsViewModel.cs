@@ -34,12 +34,12 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
             ClientID = Clients.FirstOrDefault()?.ClientID ?? 1,
             ServiceID = Services.FirstOrDefault()?.ServiceID ?? 1,
             TrainerID = Trainers.FirstOrDefault()?.TrainerID ?? 1,
-            BookingDateTime = DateTime.MinValue,
+            BookingDateTime = DateTime.Now,
             SessionsCount = 0,
             TotalPrice = 0,
             Status = "Запланировано",
             Notes = "",
-            CreatedDate = DateTime.MinValue
+            CreatedDate = DateTime.Now
         };
 
         Items.Add(booking);
@@ -59,7 +59,7 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
         // Проверяем обязательные поля
         if (CheckFilling())
         {
-            MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
+            MessageBox.Show("Поля Статус и Кол-во занятий обязательны для заполнения.",
                     "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
@@ -67,19 +67,19 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
         base.SaveSelectedItem();
     }
 
-    protected override void UpdateItem()
-    {
-        if (SelectedBooking == null)
-            return;
+    //protected override void UpdateItem()
+    //{
+    //    if (SelectedBooking == null)
+    //        return;
 
-        // Проверяем обязательные поля
-        if (CheckFilling())
-        {
-            MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+    //    // Проверяем обязательные поля
+    //    if (CheckFilling())
+    //    {
+    //        MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
+    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+    //        return;
+    //    }
 
-        base.UpdateItem();
-    }
+    //    base.UpdateItem();
+    //}
 }

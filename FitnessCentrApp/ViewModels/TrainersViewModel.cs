@@ -91,21 +91,21 @@ namespace FitnessCentrApp.ViewModels
                     string.IsNullOrWhiteSpace(SelectedTrainer.SportsAchievements));
         }
 
-        protected override void UpdateItem()
-        {
-            if (SelectedTrainer == null)
-                return;
+        //protected override void UpdateItem()
+        //{
+        //    if (SelectedTrainer == null)
+        //        return;
 
-            // Проверяем обязательные поля
-            if (CheckFilling())
-            {
-                MessageBox.Show("Для заполнения обязательны все поля, кроме Зарплата и Фото.",
-                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+        //    // Проверяем обязательные поля
+        //    if (CheckFilling())
+        //    {
+        //        MessageBox.Show("Для заполнения обязательны все поля, кроме Зарплата и Фото.",
+        //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //        return;
+        //    }
 
-            base.UpdateItem();
-        }
+        //    base.UpdateItem();
+        //}
 
         private void SelectPhoto()
         {

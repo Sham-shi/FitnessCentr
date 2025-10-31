@@ -56,19 +56,19 @@ public class ServicesViewModel : BaseCrudViewModel<Service>
         base.SaveSelectedItem();
     }
 
-    protected override void UpdateItem()
-    {
-        if (SelectedService == null)
-            return;
+    //protected override void UpdateItem()
+    //{
+    //    if (SelectedService == null)
+    //        return;
 
-        // Проверяем обязательные поля
-        if (CheckFilling())
-        {
-            MessageBox.Show("Поля Название и Тип услуги обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+    //    // Проверяем обязательные поля
+    //    if (CheckFilling())
+    //    {
+    //        MessageBox.Show("Поля Название и Тип услуги обязательны для заполнения.",
+    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+    //        return;
+    //    }
 
-        base.UpdateItem();
-    }
+    //    base.UpdateItem();
+    //}
 }

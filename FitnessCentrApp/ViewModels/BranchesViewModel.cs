@@ -53,19 +53,19 @@ public class BranchesViewModel : BaseCrudViewModel<Branch>
         base.SaveSelectedItem();
     }
 
-    protected override void UpdateItem()
-    {
-        if (SelectedBranch == null)
-            return;
+    //protected override void UpdateItem()
+    //{
+    //    if (SelectedBranch == null)
+    //        return;
 
-        // Проверяем обязательные поля
-        if (CheckFilling())
-        {
-            MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+    //    // Проверяем обязательные поля
+    //    if (CheckFilling())
+    //    {
+    //        MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
+    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+    //        return;
+    //    }
 
-        base.UpdateItem();
-    }
+    //    base.UpdateItem();
+    //}
 }
