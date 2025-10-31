@@ -10,21 +10,21 @@ public class Repository<T> where T : class
         return ctx.Set<T>().AsNoTracking().ToList();
     }
 
-    public void Add(T entity)
-    {
-        using var ctx = DatabaseService.CreateContext();
+    //public void Add(T entity)
+    //{
+    //    using var ctx = DatabaseService.CreateContext();
 
-        ctx.Set<T>().Add(entity);
-        ctx.SaveChanges();
-    }
+    //    ctx.Set<T>().Add(entity);
+    //    ctx.SaveChanges();
+    //}
 
-    public void Update(T entity)
-    {
-        using var ctx = DatabaseService.CreateContext();
+    //public void Update(T entity)
+    //{
+    //    using var ctx = DatabaseService.CreateContext();
 
-        ctx.Set<T>().Update(entity);
-        ctx.SaveChanges();
-    }
+    //    ctx.Set<T>().Update(entity);
+    //    ctx.SaveChanges();
+    //}
 
     public void Delete(T entity)
     {

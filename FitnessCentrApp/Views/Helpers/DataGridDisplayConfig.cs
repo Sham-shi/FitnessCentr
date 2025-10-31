@@ -162,6 +162,11 @@ public static class DataGridDisplayConfig
         return comboColumn;
     }
 
+    //public static DataGridColumn CreateMaskedTextBosColumn(Type modelType, string propName, object? dataContext)
+    //{
+
+    //}
+
     public static void ApplyDisplayName(PropertyDescriptor property, DataGridAutoGeneratingColumnEventArgs e)
     {
         var displayAttr = property.Attributes.OfType<DisplayAttribute>().FirstOrDefault();

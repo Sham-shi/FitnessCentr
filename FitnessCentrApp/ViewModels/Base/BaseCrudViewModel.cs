@@ -30,17 +30,6 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         }
     }
 
-    //private bool _isUpdateEnabled = false;
-    //public bool IsUpdateEnabled
-    //{
-    //    get => _isUpdateEnabled;
-    //    set
-    //    {
-    //        _isUpdateEnabled = value;
-    //        OnPropertyChanged();
-    //    }
-    //}
-
     private bool _isSaveEnabled = false;
     public bool IsSaveEnabled
     {
@@ -71,7 +60,6 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
     public RelayCommand EditCommand { get; }
     public RelayCommand CreateCommand { get; }
     public RelayCommand SaveCommand { get; }
-    //public RelayCommand UpdateCommand { get; }
     public RelayCommand DeleteCommand { get; }
     public RelayCommand RefreshCommand { get; }
 
@@ -82,7 +70,6 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         EditCommand = new RelayCommand(_ => EditItem(), _ => SelectedItem != null);
         CreateCommand = new RelayCommand(_ => CreateNewItem());
         SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => SelectedItem != null);
-        //UpdateCommand = new RelayCommand(_ => UpdateItem(), _ => SelectedItem != null);
         DeleteCommand = new RelayCommand(_ => DeleteItem(), _ => SelectedItem != null);
         RefreshCommand = new RelayCommand(_ => Refresh());
     }
@@ -113,28 +100,6 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
             MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-
-    //protected virtual void UpdateItem()
-    //{
-    //    if (EditableItem == null)
-    //        return;
-
-    //    try
-    //    {
-    //        _repo.Update(EditableItem);
-    //        Refresh();
-
-    //        IsReadOnly = true;
-    //        EditableItem = null; // снимаем режим редактирования
-    //        IsUpdateEnabled = false;
-
-    //        MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        MessageBox.Show($"Ошибка при обновлении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-    //    }
-    //}
 
     protected virtual void EditItem()
     {

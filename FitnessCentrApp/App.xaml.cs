@@ -27,7 +27,23 @@ namespace FitnessCentrApp
 
             // Или если хочешь MSSQL:
             //DatabaseService.UseDatabase("MSSQL");
+
+            try
+            {
+                DatabaseService.InitializeDatabase();
+            }
+            catch (Exception ex)
+            {
+                // Если сервис выбросил ошибку - ловим ее и показываем
+                MessageBox.Show(
+                    $"Не удалось инициализировать или заполнить базу данных: {ex.Message}\n\n{ex.InnerException?.Message}",
+                    "Критическая ошибка базы данных",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                // Закрываем приложение, т.к. без БД оно работать не сможет
+                Shutdown();
+            }
         }
     }
-
 }

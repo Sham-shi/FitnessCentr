@@ -9,8 +9,8 @@
     xmlns:vm="clr-namespace:FitnessCentrApp.ViewModels"
     xmlns:views="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
     Title="MainWindow"
-    Width="800"
-    Height="500"
+    Width="1000"
+    Height="600"
     mc:Ignorable="d">
     <Grid>
         <TabControl>

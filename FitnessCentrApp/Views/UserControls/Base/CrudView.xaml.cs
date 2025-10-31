@@ -1,6 +1,7 @@
 ﻿using FitnessCentrApp.ViewModels.Base;
 using FitnessCentrApp.ViewModels.Base.Interfaces;
 using FitnessCentrApp.Views.Helpers;
+using FitnessCentrApp.Views.ValidationRules;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -191,6 +192,28 @@ public partial class CrudView : UserControl
             {
                 StringFormat = "dd.MM.yyyy"
             };
+        }
+
+        if (propName.Equals("Phone", StringComparison.OrdinalIgnoreCase))
+        {
+            var binding = new Binding(propName)
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                ValidationRules = { new PhoneValidationRule() }
+            };
+            (e.Column as DataGridTextColumn).Binding = binding;
+        }
+
+        if (propName.Equals("Email", StringComparison.OrdinalIgnoreCase))
+        {
+            var binding = new Binding(propName)
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                ValidationRules = { new EmailValidationRule() }
+            };
+            (e.Column as DataGridTextColumn).Binding = binding;
         }
     }
 }
