@@ -76,7 +76,7 @@ public partial class CrudView : UserControl
         if (row == null)
         {
             // Если строки ещё не созданы (UI не успел отрисовать), подождём немного
-            DataGridAuto.Dispatcher.InvokeAsync(() => OnBeginEditRequested(item));
+            //DataGridAuto.Dispatcher.InvokeAsync(() => OnBeginEditRequested(item));
             return;
         }
 
@@ -101,13 +101,16 @@ public partial class CrudView : UserControl
 
     private void DataGridAuto_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
     {
-        if (DataContext is not BaseCrudViewModel<object> vm)
+        if (DataContext is not IEditableViewModel vm)
             return;
 
         var item = e.Row.Item;
 
+        var isReadOnlyBinding = BindingOperations.GetBinding(DataGridAuto, DataGrid.IsReadOnlyProperty);
+        var isReadOnly = (bool)(DataGridAuto.IsReadOnly);
+
         // Если редактирование запрещено вообще
-        if (vm.IsReadOnly)
+        if (isReadOnly)
         {
             e.Cancel = true;
             return;

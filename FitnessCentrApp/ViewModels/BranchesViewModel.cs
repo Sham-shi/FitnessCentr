@@ -15,22 +15,11 @@ public class BranchesViewModel : BaseCrudViewModel<Branch>
         set => SelectedItem = value;
     }
 
-    protected override void CreateNewItem()
-    {
-        var branch = new Branch()
-        {
-            BranchName = "",
-            Address = "",
-            Phone = "",
-            Email = ""
-        };
-
-        Items.Add(branch);
-        SelectedBranch = branch;
-    }
-
     public override bool CheckFilling()
     {
+        if (EditableItem is not Branch branch)
+            return true;
+
         return string.IsNullOrWhiteSpace(SelectedBranch.BranchName) ||
                 string.IsNullOrWhiteSpace(SelectedBranch.Address) ||
                 string.IsNullOrWhiteSpace(SelectedBranch.Phone) ||
@@ -45,27 +34,11 @@ public class BranchesViewModel : BaseCrudViewModel<Branch>
         // Проверяем обязательные поля
         if (CheckFilling())
         {
-            MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
+            MessageBox.Show("Все поля обязательны для заполнения.",
                     "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         base.SaveSelectedItem();
     }
-
-    //protected override void UpdateItem()
-    //{
-    //    if (SelectedBranch == null)
-    //        return;
-
-    //    // Проверяем обязательные поля
-    //    if (CheckFilling())
-    //    {
-    //        MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
-    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-    //        return;
-    //    }
-
-    //    base.UpdateItem();
-    //}
 }

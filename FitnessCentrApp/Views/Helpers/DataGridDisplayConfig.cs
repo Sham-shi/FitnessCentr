@@ -113,9 +113,9 @@ public static class DataGridDisplayConfig
         var relatedName = propName.Replace("ID", "");
         var collectionName = ToPlural(relatedName);
 
-        // fallback, если коллекция не найдена
-        if (dataContext?.GetType().GetProperty(collectionName) == null)
-            collectionName = relatedName;
+        //// fallback, если коллекция не найдена
+        //if (dataContext?.GetType().GetProperty(collectionName) == null)
+        //    collectionName = relatedName;
 
         var navProp = modelType.GetProperty(relatedName);
         if (navProp == null)
@@ -161,11 +161,6 @@ public static class DataGridDisplayConfig
 
         return comboColumn;
     }
-
-    //public static DataGridColumn CreateMaskedTextBosColumn(Type modelType, string propName, object? dataContext)
-    //{
-
-    //}
 
     public static void ApplyDisplayName(PropertyDescriptor property, DataGridAutoGeneratingColumnEventArgs e)
     {

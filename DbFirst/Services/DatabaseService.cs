@@ -26,6 +26,13 @@ public static class DatabaseService
         _currentDb = dbType;
     }
 
+    public static List<T> GetAll<T>() where T : class
+    {
+        using var context = CreateContext();
+        // AsNoTracking() для эффективности, т.к. мы только читаем
+        return context.Set<T>().AsNoTracking().ToList();
+    }
+
     public static FitnessCenterContext CreateContext()
     {
         if (_configuration == null)

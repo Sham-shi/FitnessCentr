@@ -15,27 +15,21 @@ public class ServicesViewModel : BaseCrudViewModel<Service>
         set { SelectedItem = value; }
     }
 
-    /// <summary>
-    /// Создать новую услугу (пока не добавляется в БД)
-    /// </summary>
     protected override void CreateNewItem()
     {
-        var service = new Service()
-        {
-            ServiceName = "",
-            ServiceType = "",
-            DurationMinutes = 0,
-            MaxParticipants = 0,
-            BasePrice = 0,
-            Description = ""
-        };
+        base.CreateNewItem();
 
-        Items.Add(service);
-        SelectedService = service;
+        if (EditableItem is Service service)
+        {
+            service.MaxParticipants = 1;
+        }
     }
 
     public override bool CheckFilling()
     {
+        if (EditableItem is not Service service)
+            return true;
+
         return string.IsNullOrWhiteSpace(SelectedService.ServiceName) ||
                 string.IsNullOrWhiteSpace(SelectedService.ServiceType);
     }
@@ -55,20 +49,4 @@ public class ServicesViewModel : BaseCrudViewModel<Service>
 
         base.SaveSelectedItem();
     }
-
-    //protected override void UpdateItem()
-    //{
-    //    if (SelectedService == null)
-    //        return;
-
-    //    // Проверяем обязательные поля
-    //    if (CheckFilling())
-    //    {
-    //        MessageBox.Show("Поля Название и Тип услуги обязательны для заполнения.",
-    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-    //        return;
-    //    }
-
-    //    base.UpdateItem();
-    //}
 }

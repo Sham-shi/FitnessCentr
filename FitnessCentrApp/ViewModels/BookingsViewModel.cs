@@ -22,32 +22,28 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
 
     public BookingsViewModel()
     {
-        Clients = new ObservableCollection<Client>(new Repository<Client>().GetAll());
-        Services = new ObservableCollection<Service>(new Repository<Service>().GetAll());
-        Trainers = new ObservableCollection<Trainer>(new Repository<Trainer>().GetAll());
+        Clients = new ObservableCollection<Client>(DatabaseService.GetAll<Client>());
+        Services = new ObservableCollection<Service>(DatabaseService.GetAll<Service>());
+        Trainers = new ObservableCollection<Trainer>(DatabaseService.GetAll<Trainer>());
     }
 
     protected override void CreateNewItem()
     {
-        var booking = new Booking()
-        {
-            ClientID = Clients.FirstOrDefault()?.ClientID ?? 1,
-            ServiceID = Services.FirstOrDefault()?.ServiceID ?? 1,
-            TrainerID = Trainers.FirstOrDefault()?.TrainerID ?? 1,
-            BookingDateTime = DateTime.Now,
-            SessionsCount = 0,
-            TotalPrice = 0,
-            Status = "Запланировано",
-            Notes = "",
-            CreatedDate = DateTime.Now
-        };
+        base.CreateNewItem();
 
-        Items.Add(booking);
-        SelectedBooking = booking;
+        if (EditableItem is Booking booking)
+        {
+            booking.ClientID = Clients.FirstOrDefault()?.ClientID ?? 1;
+            booking.ServiceID = Services.FirstOrDefault()?.ServiceID ?? 1;
+            booking.TrainerID = Trainers.FirstOrDefault()?.TrainerID ?? 1;
+        }
     }
 
     public override bool CheckFilling()
     {
+        if (EditableItem is not Booking booking)
+            return true;
+
         return string.IsNullOrWhiteSpace(SelectedBooking.Status);
     }
 
@@ -66,20 +62,4 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
 
         base.SaveSelectedItem();
     }
-
-    //protected override void UpdateItem()
-    //{
-    //    if (SelectedBooking == null)
-    //        return;
-
-    //    // Проверяем обязательные поля
-    //    if (CheckFilling())
-    //    {
-    //        MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
-    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-    //        return;
-    //    }
-
-    //    base.UpdateItem();
-    //}
 }

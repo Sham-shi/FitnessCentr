@@ -11,7 +11,7 @@ namespace FitnessCentrApp.ViewModels
 {
     public class TrainersViewModel : BaseCrudViewModel<Trainer>
     {
-        private readonly Repository<Branch> _branchesRepo = new();
+        //private readonly Repository<Branch> _branchesRepo = new();
 
         public ObservableCollection<Trainer> Trainers => Items;
 
@@ -34,36 +34,20 @@ namespace FitnessCentrApp.ViewModels
 
         public TrainersViewModel()
         {
-            Branches = new ObservableCollection<Branch>(_branchesRepo.GetAll());
+            Branches = new ObservableCollection<Branch>(DatabaseService.GetAll<Branch>());
             SelectPhotoCommand = new RelayCommand(_ => SelectPhoto());
         }
 
-        /// <summary>
-        /// Создать нового тренера (пока не добавляется в БД)
-        /// </summary>
         protected override void CreateNewItem()
         {
-            var trainer = new Trainer
-            {
-                FullName = "",
-                Phone = "",
-                Email = "",
-                Education = "",
-                WorkExperience = "",
-                SportsAchievements = "",
-                Specialization = "",
-                Salary = 0,
-                BranchID = Branches.FirstOrDefault()?.BranchID ?? 1,
-                PhotoPath = ""
-            };
+            base.CreateNewItem();
 
-            Items.Add(trainer);
-            SelectedTrainer = trainer;
+            if (EditableItem is Trainer trainer)
+            {
+                trainer.BranchID = Branches.FirstOrDefault()?.BranchID ?? 1;
+            }
         }
 
-        /// <summary>
-        /// Сохранить выбранного тренера в БД
-        /// </summary>
         protected override void SaveSelectedItem()
         {
             if (SelectedTrainer == null)
@@ -82,6 +66,10 @@ namespace FitnessCentrApp.ViewModels
 
         public override bool CheckFilling()
         {
+            // Сначала безопасная проверка: если нет выбранного/редактируемого тренера - это ошибка
+            if (EditableItem is not Trainer trainer)
+                return true;
+
             return (string.IsNullOrWhiteSpace(SelectedTrainer.FullName) ||
                     string.IsNullOrWhiteSpace(SelectedTrainer.Phone) ||
                     string.IsNullOrWhiteSpace(SelectedTrainer.Email) ||
@@ -90,22 +78,6 @@ namespace FitnessCentrApp.ViewModels
                     string.IsNullOrWhiteSpace(SelectedTrainer.WorkExperience) ||
                     string.IsNullOrWhiteSpace(SelectedTrainer.SportsAchievements));
         }
-
-        //protected override void UpdateItem()
-        //{
-        //    if (SelectedTrainer == null)
-        //        return;
-
-        //    // Проверяем обязательные поля
-        //    if (CheckFilling())
-        //    {
-        //        MessageBox.Show("Для заполнения обязательны все поля, кроме Зарплата и Фото.",
-        //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //        return;
-        //    }
-
-        //    base.UpdateItem();
-        //}
 
         private void SelectPhoto()
         {
@@ -128,12 +100,34 @@ namespace FitnessCentrApp.ViewModels
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
 
-                var fileName = Path.GetFileName(dlg.FileName);
-                var destPath = Path.Combine(folder, fileName);
-                File.Copy(dlg.FileName, destPath, true);
+                // --- Создаем уникальное имя файла ---
+                var fileExtension = Path.GetExtension(dlg.FileName);
+                // Используем GUID для уникальности
+                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                var destPath = Path.Combine(folder, uniqueFileName);
+                // ------------------------------------------------
 
-                SelectedTrainer.PhotoPath = $"/Photos/{fileName}";
-                OnPropertyChanged(nameof(SelectedPhoto));
+                try
+                {
+                    File.Copy(dlg.FileName, destPath, true);
+                    SelectedTrainer!.PhotoPath = $"/Photos/{uniqueFileName}";
+                    OnPropertyChanged(nameof(SelectedPhoto));
+
+                    // Включаем режим сохранения, так как мы изменили модель
+                    //IsReadOnly = false;
+                    //IsSaveEnabled = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка копирования файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                //var fileName = Path.GetFileName(dlg.FileName);
+                //var destPath = Path.Combine(folder, fileName);
+                //File.Copy(dlg.FileName, destPath, true);
+
+                //SelectedTrainer.PhotoPath = $"/Photos/{fileName}";
+                //OnPropertyChanged(nameof(SelectedPhoto));
             }
         }
 

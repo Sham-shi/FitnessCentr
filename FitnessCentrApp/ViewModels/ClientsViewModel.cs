@@ -17,21 +17,22 @@ public class ClientsViewModel : BaseCrudViewModel<Client>
 
     protected override void CreateNewItem()
     {
-        var client = new Client()
-        {
-            FullName = "",
-            Phone = "",
-            Email = "",
-            BirthDate = DateOnly.FromDateTime(DateTime.Now),
-            RegistrationDate = DateOnly.FromDateTime(DateTime.Now)
-        };
+        // 1. Вызываем базовый метод для создания пустого объекта
+        base.CreateNewItem();
 
-        Items.Add(client);
-        SelectedClient = client;
+        // 2. Применяем специфичные значения для нового клиента
+        if (EditableItem is Client client)
+        {
+            client.BirthDate = DateOnly.FromDateTime(DateTime.Today);
+            client.RegistrationDate = DateOnly.FromDateTime(DateTime.Today);
+        }
     }
 
     public override bool CheckFilling()
     {
+        if (EditableItem is not Client client)
+            return true;
+
         return string.IsNullOrWhiteSpace(SelectedClient.FullName) ||
                 string.IsNullOrWhiteSpace(SelectedClient.Phone);
     }
@@ -51,20 +52,4 @@ public class ClientsViewModel : BaseCrudViewModel<Client>
 
         base.SaveSelectedItem();
     }
-
-    //protected override void UpdateItem()
-    //{
-    //    if (SelectedClient == null)
-    //        return;
-
-    //    // Проверяем обязательные поля
-    //    if (CheckFilling())
-    //    {
-    //        MessageBox.Show("Поля ФИО и Телефон обязательны для заполнения.",
-    //                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-    //        return;
-    //    }
-
-    //    base.UpdateItem();
-    //}
 }

@@ -1,15 +1,15 @@
 ﻿using DbFirst.Models;
 using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace FitnessCentrApp.ViewModels.Base;
 
 public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, ICheckableViewModel where T : class, new()
 {
-    protected readonly Repository<T> _repo = new();
-
     public ObservableCollection<T> Items { get; set; }
 
     private T? _selectedItem;
@@ -65,28 +65,52 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
 
     protected BaseCrudViewModel()
     {
-        Items = new ObservableCollection<T>(_repo.GetAll());
+        Items = new ObservableCollection<T>();
 
         EditCommand = new RelayCommand(_ => EditItem(), _ => SelectedItem != null);
         CreateCommand = new RelayCommand(_ => CreateNewItem());
-        SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => SelectedItem != null);
+        SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => EditableItem != null);
         DeleteCommand = new RelayCommand(_ => DeleteItem(), _ => SelectedItem != null);
         RefreshCommand = new RelayCommand(_ => Refresh());
+
+        Refresh();
     }
 
     protected virtual void CreateNewItem()
     {
-        // логика у каждого своя
+        // 1. Создаем новый экземпляр T
+        SelectedItem = new T();
+        EditableItem = SelectedItem;
+        IsReadOnly = false;
+        IsSaveEnabled = true;
+
+        // 2. Добавляем элемент в коллекцию (начинается асинхронная отрисовка)
+        Items.Add(SelectedItem);
+
+        // 3. Откладываем сигнал для View, чтобы он выполнился после завершения отрисовки DataGrid.
+        Application.Current.Dispatcher.BeginInvoke(
+            DispatcherPriority.Background, // Низкий приоритет, ждем завершения основного рендеринга
+            new Action(() => BeginEditRequested?.Invoke(SelectedItem))
+        );
     }
 
     protected virtual void SaveSelectedItem()
     {
-        if (EditableItem == null)
+        if (EditableItem is not T entity || entity.Equals(default(T)))
             return;
 
         try
         {
-            _repo.Save(EditableItem);
+            using var ctx = DatabaseService.CreateContext();
+
+            // EF Core 6/7: Update() выполняет проверку ID и устанавливает
+            // State = Added, если ID = 0, или State = Modified, если ID > 0.
+            // Это заменяет всю логику Reflection и ручной установки State.
+            ctx.Set<T>().Update(entity);
+
+            ctx.SaveChanges();
+
+            //_repo.Save(EditableItem);
             Refresh();
 
             IsReadOnly = true; // снова делаем только для чтения
@@ -100,6 +124,57 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
             MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+    //protected override void SaveSelectedItem()
+    //{
+    //    // EditableItem уже приводится к T в родительском классе, но
+    //    // здесь мы хотим быть уверены, что он реализует наш интерфейс.
+    //    if (EditableItem is not T entity || entity.Equals(default(T)))
+    //        return;
+
+    //    try
+    //    {
+    //        using var ctx = DatabaseService.CreateContext();
+
+    //        // Попробуем найти описание сущности в модели EF
+    //        var entityTypeInfo = ctx.Model.FindEntityType(typeof(T));
+    //        if (entityTypeInfo == null)
+    //            throw new InvalidOperationException($"Тип {typeof(T).Name} не зарегистрирован в контексте EF.");
+
+    //        // Находим первичный ключ (например, TrainerID)
+    //        var keyProp = entityTypeInfo.FindPrimaryKey()?.Properties?.FirstOrDefault();
+    //        if (keyProp == null)
+    //            throw new InvalidOperationException($"У типа {typeof(T).Name} не найден первичный ключ.");
+
+    //        var idProp = typeof(T).GetProperty(keyProp.Name);
+    //        if (idProp == null)
+    //            throw new InvalidOperationException($"Свойство первичного ключа '{keyProp.Name}' отсутствует у типа {typeof(T).Name}.");
+
+    //        // Проверяем — новая ли сущность
+    //        var idValue = idProp.GetValue(entity);
+    //        bool isNew = idValue == null
+    //         // Проверяем, является ли ID значением по умолчанию (0 для int, null для nullable)
+    //         || idValue.Equals(Activator.CreateInstance(idProp.PropertyType));
+
+    //        // Устанавливаем состояние и сохраняем
+    //        var entry = ctx.Entry(entity);
+    //        entry.State = isNew ? EntityState.Added : EntityState.Modified;
+
+    //        ctx.SaveChanges();
+
+    //        // Обновляем список, чтобы новый объект получил сгенерированный ID
+    //        Refresh();
+
+    //        IsReadOnly = true;
+    //        EditableItem = null;
+    //        IsSaveEnabled = false;
+
+    //        MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+    //    }
+    //}
 
     protected virtual void EditItem()
     {
@@ -127,7 +202,11 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         {
             try
             {
-                _repo.Delete(SelectedItem);
+                using var ctx = DatabaseService.CreateContext();
+                ctx.Set<T>().Remove(SelectedItem);
+                ctx.SaveChanges();
+
+                //_repo.Delete(SelectedItem);
                 Refresh();
             }
             catch (Exception ex)
@@ -139,8 +218,12 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
 
     protected virtual void Refresh()
     {
+        using var ctx = DatabaseService.CreateContext();
+        // Используем ToList() для выполнения запроса, а AsNoTracking() для скорости чтения
+        var newItems = ctx.Set<T>().AsNoTracking().ToList();
+
         Items.Clear();
-        foreach (var item in _repo.GetAll())
+        foreach (var item in newItems)
             Items.Add(item);
 
         IsReadOnly = true;
