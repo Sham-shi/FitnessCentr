@@ -2,6 +2,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.DirectoryServices.ActiveDirectory;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -231,6 +232,125 @@ public static class DataGridDisplayConfig
         // Загружаем шаблон из строки XAML
         var editTemplate = (DataTemplate)XamlReader.Parse(xamlTemplate);
         templateColumn.CellEditingTemplate = editTemplate;
+
+        return templateColumn;
+    }
+
+    public static DataGridColumn CreateDateInputColumn(string propName, string stringFormat, Type propertyType)
+    {
+        var templateColumn = new DataGridTemplateColumn();
+
+        // --- Просмотр (одинаковый для всех типов) ---
+        string cellXaml = $@"
+    <DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>
+        <TextBlock Text='{{Binding {propName}, StringFormat={stringFormat}}}' 
+                   VerticalAlignment='Center' 
+                   Padding='4,0' />
+    </DataTemplate>";
+
+        templateColumn.CellTemplate = (DataTemplate)XamlReader.Parse(cellXaml);
+
+        // --- Редактирование ---
+        string editXaml;
+
+        // ✅ Если тип DateOnly или DateOnly?
+        if (propertyType == typeof(DateOnly) || propertyType == typeof(DateOnly?))
+        {
+            editXaml = $@"
+        <DataTemplate 
+            xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+            xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+            xmlns:conv='clr-namespace:FitnessCentrApp.Views.Converters;assembly=FitnessCentrApp'>
+            
+            <DataTemplate.Resources>
+                <conv:DateOnlyConverter x:Key='dateOnlyConverter'/>
+            </DataTemplate.Resources>
+
+            <DatePicker SelectedDate='{{Binding {propName}, 
+                                              Mode=TwoWay, 
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={{StaticResource dateOnlyConverter}}, 
+                                              ValidatesOnExceptions=True, 
+                                              NotifyOnValidationError=True}}' 
+                        SelectedDateFormat='Short' 
+                        VerticalAlignment='Center'
+                        Width='120'
+                        HorizontalAlignment='Left'/>
+        </DataTemplate>";
+        }
+        // ✅ Если тип DateTime или DateTime?
+        else
+        {
+            editXaml = $@"
+        <DataTemplate 
+            xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+            xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+            xmlns:xctk='clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit'>
+            
+            <xctk:DateTimePicker 
+                Value='{{Binding {propName}, 
+                                  Mode=TwoWay, 
+                                  UpdateSourceTrigger=PropertyChanged,
+                                  ValidatesOnExceptions=True, 
+                                  NotifyOnValidationError=True}}'
+                Format='Custom'
+                FormatString='dd.MM.yyyy HH:mm'
+                TimePickerVisibility='Visible'
+                AllowTextInput='False'
+                ShowButtonSpinner='True'
+                VerticalAlignment='Center'
+                Width='100'
+                HorizontalAlignment='Left'/>
+        </DataTemplate>";
+        }
+
+        templateColumn.CellEditingTemplate = (DataTemplate)XamlReader.Parse(editXaml);
+
+        return templateColumn;
+    }
+
+    public static DataGridColumn CreateDateTimeInputColumn(string propName, string stringFormat)
+    {
+        var templateColumn = new DataGridTemplateColumn();
+
+        // --- 1. CellTemplate (Режим просмотра) ---
+        // Формируем чистую строку XAML-привязки
+        string bindingString = $"{{Binding {propName}, StringFormat='{{0:{stringFormat}}}'}}";
+
+        // Используем сформированную строку в cellXaml
+        string cellXaml = $@"
+        <DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>
+            <TextBlock Text='{bindingString}' 
+                       VerticalAlignment='Center' 
+                       Padding='4,0' />
+        </DataTemplate>";
+
+        templateColumn.CellTemplate = (DataTemplate)XamlReader.Parse(cellXaml);
+
+        // --- 2. CellEditingTemplate (Режим редактирования) ---
+        string editXaml = $@"
+        <DataTemplate 
+            xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+            xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+            
+            xmlns:xctk='http://schemas.xceed.com/wpf/xaml/toolkit'> 
+            
+            <xctk:DateTimePicker Value='{{Binding {propName}, 
+                                           Mode=TwoWay, 
+                                           UpdateSourceTrigger=PropertyChanged, 
+                                           ValidatesOnExceptions=True, 
+                                           NotifyOnValidationError=True}}'
+                                 
+                                 // Устанавливаем формат отображения (аналогично StringFormat)
+                                 Format='Custom'
+                                 TimeFormat='ShortTime'
+                                 FormatString='{stringFormat}' 
+                                 VerticalAlignment='Center'
+                                 Width='180' 
+                                 HorizontalAlignment='Left' />
+        </DataTemplate>";
+
+        templateColumn.CellEditingTemplate = (DataTemplate)XamlReader.Parse(editXaml);
 
         return templateColumn;
     }

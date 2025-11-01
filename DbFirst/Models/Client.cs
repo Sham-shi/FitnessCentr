@@ -35,7 +35,7 @@ public partial class Client
     public DateOnly? BirthDate { get; set; }
 
     [Display(Name = "Дата регистрации")]
-    public DateOnly RegistrationDate { get; set; }
+    public DateOnly? RegistrationDate { get; set; }
 
     [InverseProperty("Client")]
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();

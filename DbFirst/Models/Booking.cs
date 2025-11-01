@@ -25,7 +25,7 @@ public partial class Booking
     public int TrainerID { get; set; }
 
     [Display(Name = "Дата занятия")]
-    public DateTime BookingDateTime { get; set; }
+    public DateTime? BookingDateTime { get; set; }
 
     [Display(Name = "Кол-во занятий")]
     public int SessionsCount { get; set; }
@@ -44,7 +44,7 @@ public partial class Booking
     public string Notes { get; set; }
 
     [Display(Name = "Дата записи")]
-    public DateTime CreatedDate { get; set; }
+    public DateTime? CreatedDate { get; set; }
 
     [ForeignKey("ClientID")]
     [InverseProperty("Bookings")]

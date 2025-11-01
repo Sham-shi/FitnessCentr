@@ -181,20 +181,18 @@ public partial class CrudView : UserControl
             e.Column = DataGridDisplayConfig.CreateForeignKeyColumn(modelType, propName, DataContext);
         }
 
-        if (type == typeof(DateTime) || type == typeof(DateTime?))
-        {
-            (e.Column as DataGridTextColumn).Binding = new Binding(e.PropertyName)
-            {
-                StringFormat = "dd.MM.yyyy HH:mm"
-            };
-        }
+        var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
 
-        if (type == typeof(DateOnly) || type == typeof(DateOnly?))
+        if (underlyingType == typeof(DateTime) || underlyingType == typeof(DateOnly))
         {
-            (e.Column as DataGridTextColumn).Binding = new Binding(e.PropertyName)
-            {
-                StringFormat = "dd.MM.yyyy"
-            };
+            string format = (underlyingType == typeof(DateTime))
+                ? "dd.MM.yyyy HH:mm"
+                : "dd.MM.yyyy";
+
+            e.Column = DataGridDisplayConfig.CreateDateInputColumn(propName, format, underlyingType);
+
+            DataGridDisplayConfig.ApplyDisplayName(property, e);
+            return;
         }
 
         if (propName.Equals("Phone", StringComparison.OrdinalIgnoreCase))
