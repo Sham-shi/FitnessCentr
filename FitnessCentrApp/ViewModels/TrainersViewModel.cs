@@ -26,7 +26,7 @@ namespace FitnessCentrApp.ViewModels
             }
         }
 
-        public BitmapImage? SelectedPhoto => LoadPhoto(SelectedTrainer?.PhotoPath);
+        public BitmapImage? SelectedPhoto => LoadPhoto((EditableItem as Trainer)?.PhotoPath ?? SelectedTrainer?.PhotoPath);
 
         public RelayCommand SelectPhotoCommand { get; }
 
@@ -94,7 +94,9 @@ namespace FitnessCentrApp.ViewModels
 
             if (dlg.ShowDialog() == true)
             {
-                var folder = Path.Combine(Directory.GetCurrentDirectory(), "Photos");
+                var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var folder = Path.Combine(appDirectory, "Photos");
+
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
 
@@ -116,25 +118,17 @@ namespace FitnessCentrApp.ViewModels
 
                 try
                 {
+                    // КЛЮЧЕВОЙ ШАГ: КОПИРУЕМ ФАЙЛ С ДИСКА ПОЛЬЗОВАТЕЛЯ В НАШУ ПАПКУ
+                    // Поскольку имя файла уникально, перезаписи не произойдет.
                     File.Copy(dlg.FileName, destPath, true);
-                    SelectedTrainer!.PhotoPath = $"/Photos/{uniqueFileName}";
+                    // Это путь, относительно корня приложения или сервера.
+                    trainer.PhotoPath = $"/Photos/{uniqueFileName}";
                     OnPropertyChanged(nameof(SelectedPhoto));
-
-                    // Включаем режим сохранения, так как мы изменили модель
-                    //IsReadOnly = false;
-                    //IsSaveEnabled = true;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка копирования файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-
-                //var fileName = Path.GetFileName(dlg.FileName);
-                //var destPath = Path.Combine(folder, fileName);
-                //File.Copy(dlg.FileName, destPath, true);
-
-                //SelectedTrainer.PhotoPath = $"/Photos/{fileName}";
-                //OnPropertyChanged(nameof(SelectedPhoto));
             }
         }
 
@@ -144,19 +138,24 @@ namespace FitnessCentrApp.ViewModels
                 return null;
 
             path = path.TrimStart('\\', '/');
-            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
+            var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var fullPath = Path.Combine(appDirectory, path);
 
             if (!File.Exists(fullPath))
                 return null;
 
             try
             {
-                var image = new BitmapImage();
-                image.BeginInit();
-                image.UriSource = new Uri(fullPath);
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.EndInit();
-                return image;
+                using (var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read))
+                {
+                    var image = new BitmapImage();
+                    image.BeginInit();
+                    image.CacheOption = BitmapCacheOption.OnLoad; // Освобождает файл после загрузки
+                    image.StreamSource = stream; // Загрузка из потока
+                    image.EndInit();
+                    image.Freeze(); // Рекомендуется для BitmapImage в MVVM
+                    return image;
+                }
             }
             catch
             {

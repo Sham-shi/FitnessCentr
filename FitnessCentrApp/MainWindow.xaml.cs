@@ -8,17 +8,10 @@ namespace FitnessCentrApp;
 /// </summary>
 public partial class MainWindow : Window
 {
-    //private BranchesView branchesView = new();
-    //private TrainersView trainersView = new();
-    //private ServicesView servicesView = new();
-    //private ClientsView clientsView = new();
     public MainWindow()
     {
         InitializeComponent();
 
-        //TrainersTab.Content = trainersView;
-        //BranchesTab.Content = branchesView;
-        //ServicesTab.Content = servicesView;
-        //ClientsTab.Content = clientsView;
+        //Application.Current.ThemeMode = System.Windows.Controls.ThemeMode.Dark;
     }
 }

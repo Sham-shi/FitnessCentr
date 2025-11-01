@@ -36,14 +36,14 @@ public static class DatabaseService
     public static FitnessCenterContext CreateContext()
     {
         if (_configuration == null)
-            throw new InvalidOperationException("DatabaseService not initialized. Call Initialize(...) on startup.");
+            throw new InvalidOperationException("DatabaseService не инициализирована. Вызовите функцию Initialize(...) при запуске.");
 
         var optionsBuilder = new DbContextOptionsBuilder<FitnessCenterContext>();
 
         if (_currentDb == "SQLite")
         {
             if (string.IsNullOrWhiteSpace(_sqliteConn))
-                throw new InvalidOperationException("SQLite connection string is empty. Check appsettings.json.");
+                throw new InvalidOperationException("Строка подключения SQLite пуста. Проверьте файл appsettings.json.");
 
             string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FitnessCenter.db");
             // Если пользователь записал просто имя файла или относительный путь, нормализуем:
@@ -53,7 +53,7 @@ public static class DatabaseService
         else // MSSQL
         {
             if (string.IsNullOrWhiteSpace(_mssqlConn))
-                throw new InvalidOperationException("MSSQL connection string is empty. Check appsettings.json.");
+                throw new InvalidOperationException("Строка подключения к MSSQL пуста. Проверьте файл appsettings.json.");
 
             optionsBuilder.UseSqlServer(_mssqlConn);
         }
