@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace FitnessCentrApp.Views.UserControls.Base;
 
@@ -26,9 +27,38 @@ public partial class CrudView : UserControl
                 {
                     notifier.PropertyChanged += (s2, e2) =>
                     {
-                        if (e2.PropertyName == "IsReadOnly")
+                        if (e2.PropertyName == nameof(vm.IsReadOnly))
                         {
-                            AdjustAllColumnWidths();
+                            if (vm.IsReadOnly)
+                            {
+                                // Вышли из редактирования — фиксируем и пересчитываем
+                                Dispatcher.InvokeAsync(() =>
+                                {
+                                    foreach (var col in DataGridAuto.Columns)
+                                    {
+                                        // Снимаем ограничения на MinWidth
+                                        col.MinWidth = 0;
+
+                                        // Выполняем корректировку один раз
+                                        AdjustAllColumnWidths();
+                                    }
+                                }, DispatcherPriority.Background);
+                            }
+                            else
+                            {
+                                // Вошли в режим редактирования — делаем колонки "плавающими"
+                                foreach (var col in DataGridAuto.Columns)
+                                {
+                                    // запоминаем текущую ширину как минимальную
+                                    double currentWidth = col.ActualWidth;
+
+                                    // сбрасываем фиксированную ширину, разрешаем авторасчёт
+                                    col.Width = DataGridLength.Auto;
+
+                                    // задаём минимальную ширину, чтобы не схлопывались
+                                    col.MinWidth = currentWidth;
+                                }
+                            }
                         }
                     };
                 }

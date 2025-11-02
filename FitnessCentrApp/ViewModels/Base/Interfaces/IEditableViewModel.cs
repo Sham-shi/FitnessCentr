@@ -4,4 +4,5 @@ public interface IEditableViewModel
 {
     event Action<object> BeginEditRequested;
     object? EditableItem { get; }
+    bool IsReadOnly { get; }
 }

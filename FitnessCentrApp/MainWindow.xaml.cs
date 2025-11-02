@@ -11,7 +11,5 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
-        //Application.Current.ThemeMode = System.Windows.Controls.ThemeMode.Dark;
     }
 }
