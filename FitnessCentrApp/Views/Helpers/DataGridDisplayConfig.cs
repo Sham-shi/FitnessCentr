@@ -110,7 +110,7 @@ public static class DataGridDisplayConfig
         }
     }
 
-    public static DataGridColumn CreateForeignKeyColumn(Type modelType, string propName, object? dataContext)
+    public static DataGridColumn CreateForeignKeyColumn(Type modelType, string propName)
     {
         var relatedName = propName.Replace("ID", "");
         var collectionName = ToPlural(relatedName);
@@ -303,52 +303,6 @@ public static class DataGridDisplayConfig
                 HorizontalAlignment='Left'/>
         </DataTemplate>";
         }
-
-        templateColumn.CellEditingTemplate = (DataTemplate)XamlReader.Parse(editXaml);
-
-        return templateColumn;
-    }
-
-    public static DataGridColumn CreateDateTimeInputColumn(string propName, string stringFormat)
-    {
-        var templateColumn = new DataGridTemplateColumn();
-
-        // --- 1. CellTemplate (Режим просмотра) ---
-        // Формируем чистую строку XAML-привязки
-        string bindingString = $"{{Binding {propName}, StringFormat='{{0:{stringFormat}}}'}}";
-
-        // Используем сформированную строку в cellXaml
-        string cellXaml = $@"
-        <DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>
-            <TextBlock Text='{bindingString}' 
-                       VerticalAlignment='Center' 
-                       Padding='4,0' />
-        </DataTemplate>";
-
-        templateColumn.CellTemplate = (DataTemplate)XamlReader.Parse(cellXaml);
-
-        // --- 2. CellEditingTemplate (Режим редактирования) ---
-        string editXaml = $@"
-        <DataTemplate 
-            xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
-            xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-            
-            xmlns:xctk='http://schemas.xceed.com/wpf/xaml/toolkit'> 
-            
-            <xctk:DateTimePicker Value='{{Binding {propName}, 
-                                           Mode=TwoWay, 
-                                           UpdateSourceTrigger=PropertyChanged, 
-                                           ValidatesOnExceptions=True, 
-                                           NotifyOnValidationError=True}}'
-                                 
-                                 // Устанавливаем формат отображения (аналогично StringFormat)
-                                 Format='Custom'
-                                 TimeFormat='ShortTime'
-                                 FormatString='{stringFormat}' 
-                                 VerticalAlignment='Center'
-                                 Width='180' 
-                                 HorizontalAlignment='Left' />
-        </DataTemplate>";
 
         templateColumn.CellEditingTemplate = (DataTemplate)XamlReader.Parse(editXaml);
 

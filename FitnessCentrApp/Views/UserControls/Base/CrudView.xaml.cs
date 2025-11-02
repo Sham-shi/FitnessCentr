@@ -178,7 +178,7 @@ public partial class CrudView : UserControl
         // Внешний ключ → создаём ComboBox
         if (propName.EndsWith("ID", StringComparison.OrdinalIgnoreCase))
         {
-            e.Column = DataGridDisplayConfig.CreateForeignKeyColumn(modelType, propName, DataContext);
+            e.Column = DataGridDisplayConfig.CreateForeignKeyColumn(modelType, propName);
         }
 
         var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
