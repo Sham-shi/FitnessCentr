@@ -15,6 +15,9 @@ public class ServicesViewModel : BaseCrudViewModel<Service>
         set { SelectedItem = value; }
     }
 
+    // Список допустимых типов услуг для валидации
+    private readonly string[] _validServiceTypes = { "Групповое", "Индивидуальное" };
+
     protected override void CreateNewItem()
     {
         base.CreateNewItem();
@@ -22,6 +25,7 @@ public class ServicesViewModel : BaseCrudViewModel<Service>
         if (EditableItem is Service service)
         {
             service.MaxParticipants = 1;
+            service.ServiceType = _validServiceTypes[0];
         }
     }
 
@@ -31,7 +35,8 @@ public class ServicesViewModel : BaseCrudViewModel<Service>
             return true;
 
         return string.IsNullOrWhiteSpace(SelectedService.ServiceName) ||
-                string.IsNullOrWhiteSpace(SelectedService.ServiceType);
+                string.IsNullOrWhiteSpace(SelectedService.ServiceType) ||
+                !_validServiceTypes.Contains(SelectedService.ServiceType);
     }
 
     protected override void SaveSelectedItem()

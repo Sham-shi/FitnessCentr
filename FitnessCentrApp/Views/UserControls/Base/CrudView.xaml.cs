@@ -181,6 +181,24 @@ public partial class CrudView : UserControl
             e.Column = DataGridDisplayConfig.CreateForeignKeyColumn(modelType, propName);
         }
 
+        // Статус → создаём ComboBox с фиксированным списком значений
+        if (propName.Equals("Status", StringComparison.OrdinalIgnoreCase))
+        {
+            e.Column = DataGridDisplayConfig.CreateStatusColumn(propName);
+            DataGridDisplayConfig.ApplyDisplayName(property, e);
+
+            return;
+        }
+
+        // Колонка типа услуги → создаём ComboBox с фиксированными значениями
+        if (propName.Equals("ServiceType", StringComparison.OrdinalIgnoreCase))
+        {
+            e.Column = DataGridDisplayConfig.CreateServiceTypeColumn(propName);
+            DataGridDisplayConfig.ApplyDisplayName(property, e);
+
+            return;
+        }
+
         var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
 
         if (underlyingType == typeof(DateTime) || underlyingType == typeof(DateOnly))

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.DirectoryServices.ActiveDirectory;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -242,11 +241,11 @@ public static class DataGridDisplayConfig
 
         // --- Просмотр (одинаковый для всех типов) ---
         string cellXaml = $@"
-    <DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>
-        <TextBlock Text='{{Binding {propName}, StringFormat={stringFormat}}}' 
-                   VerticalAlignment='Center' 
-                   Padding='4,0' />
-    </DataTemplate>";
+        <DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>
+            <TextBlock Text='{{Binding {propName}, StringFormat={stringFormat}}}' 
+                       VerticalAlignment='Center' 
+                       Padding='4,0' />
+        </DataTemplate>";
 
         templateColumn.CellTemplate = (DataTemplate)XamlReader.Parse(cellXaml);
 
@@ -257,55 +256,116 @@ public static class DataGridDisplayConfig
         if (propertyType == typeof(DateOnly) || propertyType == typeof(DateOnly?))
         {
             editXaml = $@"
-        <DataTemplate 
-            xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
-            xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-            xmlns:conv='clr-namespace:FitnessCentrApp.Views.Converters;assembly=FitnessCentrApp'>
+            <DataTemplate 
+                xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+                xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+                xmlns:conv='clr-namespace:FitnessCentrApp.Views.Converters;assembly=FitnessCentrApp'>
             
-            <DataTemplate.Resources>
-                <conv:DateOnlyConverter x:Key='dateOnlyConverter'/>
-            </DataTemplate.Resources>
+                <DataTemplate.Resources>
+                    <conv:DateOnlyConverter x:Key='dateOnlyConverter'/>
+                </DataTemplate.Resources>
 
-            <DatePicker SelectedDate='{{Binding {propName}, 
-                                              Mode=TwoWay, 
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={{StaticResource dateOnlyConverter}}, 
-                                              ValidatesOnExceptions=True, 
-                                              NotifyOnValidationError=True}}' 
-                        SelectedDateFormat='Short' 
-                        VerticalAlignment='Center'
-                        Width='120'
-                        HorizontalAlignment='Left'/>
-        </DataTemplate>";
+                <DatePicker SelectedDate='{{Binding {propName}, 
+                                                  Mode=TwoWay, 
+                                                  UpdateSourceTrigger=PropertyChanged,
+                                                  Converter={{StaticResource dateOnlyConverter}}, 
+                                                  ValidatesOnExceptions=True, 
+                                                  NotifyOnValidationError=True}}' 
+                            SelectedDateFormat='Short' 
+                            VerticalAlignment='Center'
+                            Width='120'
+                            HorizontalAlignment='Left'/>
+            </DataTemplate>";
         }
         // ✅ Если тип DateTime или DateTime?
         else
         {
             editXaml = $@"
-        <DataTemplate 
-            xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
-            xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-            xmlns:xctk='clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit'>
+            <DataTemplate 
+                xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+                xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+                xmlns:xctk='clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit'>
             
-            <xctk:DateTimePicker 
-                Value='{{Binding {propName}, 
-                                  Mode=TwoWay, 
-                                  UpdateSourceTrigger=PropertyChanged,
-                                  ValidatesOnExceptions=True, 
-                                  NotifyOnValidationError=True}}'
-                Format='Custom'
-                FormatString='dd.MM.yyyy HH:mm'
-                TimePickerVisibility='Visible'
-                AllowTextInput='False'
-                ShowButtonSpinner='True'
-                VerticalAlignment='Center'
-                Width='100'
-                HorizontalAlignment='Left'/>
-        </DataTemplate>";
+                <xctk:DateTimePicker 
+                    Value='{{Binding {propName}, 
+                                      Mode=TwoWay, 
+                                      UpdateSourceTrigger=PropertyChanged,
+                                      ValidatesOnExceptions=True, 
+                                      NotifyOnValidationError=True}}'
+                    Format='Custom'
+                    FormatString='dd.MM.yyyy HH:mm'
+                    TimePickerVisibility='Visible'
+                    AllowTextInput='False'
+                    ShowButtonSpinner='True'
+                    VerticalAlignment='Center'
+                    Width='100'
+                    HorizontalAlignment='Left'/>
+            </DataTemplate>";
         }
 
         templateColumn.CellEditingTemplate = (DataTemplate)XamlReader.Parse(editXaml);
 
         return templateColumn;
     }
+
+    public static DataGridColumn CreateComboBoxColumn(string propName, List<string> items, string header = null)
+    {
+        var comboColumn = new DataGridTemplateColumn
+        {
+            Header = header ?? propName
+        };
+
+        // Обычный режим отображения - текстовое поле
+        var cellTemplate = new DataTemplate();
+        var textFactory = new FrameworkElementFactory(typeof(TextBlock));
+        textFactory.SetBinding(TextBlock.TextProperty, new Binding(propName));
+        cellTemplate.VisualTree = textFactory;
+        comboColumn.CellTemplate = cellTemplate;
+
+        // Режим редактирования - ComboBox
+        var editTemplate = new DataTemplate();
+        var comboFactory = new FrameworkElementFactory(typeof(ComboBox));
+
+        // Устанавливаем ItemsSource
+        comboFactory.SetValue(ComboBox.ItemsSourceProperty, items);
+
+        // Привязываем выбранное значение
+        comboFactory.SetBinding(ComboBox.SelectedItemProperty,
+            new Binding(propName) { Mode = BindingMode.TwoWay });
+
+        // Настраиваем внешний вид
+        comboFactory.SetValue(ComboBox.VerticalAlignmentProperty, VerticalAlignment.Center);
+        comboFactory.SetValue(ComboBox.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
+        comboFactory.SetValue(ComboBox.MarginProperty, new Thickness(2));
+
+        editTemplate.VisualTree = comboFactory;
+        comboColumn.CellEditingTemplate = editTemplate;
+
+        return comboColumn;
+    }
+
+    public static DataGridColumn CreateStatusColumn(string propName)
+    {
+        var statusItems = new List<string>
+    {
+        "Запланировано",
+        "Перенесено",
+        "Завершено",
+        "Отменено"
+    };
+
+        return CreateComboBoxColumn(propName, statusItems, "Статус");
+    }
+
+    public static DataGridColumn CreateServiceTypeColumn(string propName)
+    {
+        var serviceTypeItems = new List<string>
+    {
+        "Групповое",
+        "Индивидуальное"
+    };
+
+        return CreateComboBoxColumn(propName, serviceTypeItems, "Тип услуги");
+    }
+
 }

@@ -27,6 +27,8 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
         Trainers = new ObservableCollection<Trainer>(DatabaseService.GetAll<Trainer>());
     }
 
+    private readonly string[] _validStatuses = { "Запланировано", "Перенесено", "Завершено", "Отменено" };
+
     protected override void CreateNewItem()
     {
         base.CreateNewItem();
@@ -36,6 +38,7 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
             booking.ClientID = Clients.FirstOrDefault()?.ClientID ?? 1;
             booking.ServiceID = Services.FirstOrDefault()?.ServiceID ?? 1;
             booking.TrainerID = Trainers.FirstOrDefault()?.TrainerID ?? 1;
+            booking.Status = _validStatuses[0];
         }
     }
 
@@ -44,7 +47,8 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
         if (EditableItem is not Booking booking)
             return true;
 
-        return string.IsNullOrWhiteSpace(SelectedBooking.Status);
+        return string.IsNullOrWhiteSpace(SelectedBooking.Status) ||
+               !_validStatuses.Contains(SelectedBooking.Status);
     }
 
     protected override void SaveSelectedItem()
