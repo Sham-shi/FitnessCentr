@@ -9,6 +9,7 @@
     xmlns:views="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
     xmlns:vm="clr-namespace:FitnessCentrApp.ViewModels"
     Title="MainWindow"
+    WindowStartupLocation="CenterScreen"
     Width="1000"
     Height="600"
     mc:Ignorable="d">

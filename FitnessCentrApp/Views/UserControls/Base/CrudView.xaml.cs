@@ -1,11 +1,7 @@
-﻿using DbFirst.Models;
-using FitnessCentrApp.ViewModels;
-using FitnessCentrApp.ViewModels.Base;
-using FitnessCentrApp.ViewModels.Base.Interfaces;
+﻿using FitnessCentrApp.ViewModels.Base.Interfaces;
 using FitnessCentrApp.Views.Helpers;
 using FitnessCentrApp.Views.ValidationRules;
 using System.ComponentModel;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;

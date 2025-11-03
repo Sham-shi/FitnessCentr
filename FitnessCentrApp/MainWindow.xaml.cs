@@ -1,5 +1,4 @@
-﻿using FitnessCentrApp.Views.UserControls;
-using System.Windows;
+﻿using System.Windows;
 
 namespace FitnessCentrApp;
 
