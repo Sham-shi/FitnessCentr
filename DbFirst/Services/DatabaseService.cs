@@ -8,6 +8,7 @@ public static class DatabaseService
 {
     private static IConfigurationRoot? _configuration;
     private static string _currentDb = "SQLite"; // default MSSQL
+    public static string CurrentDb => _currentDb;
     private static string? _mssqlConn;
     private static string? _sqliteConn;
 

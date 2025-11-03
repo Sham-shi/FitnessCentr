@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbFirst", "DbFirst\DbFirst.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessCentrApp", "FitnessCentrApp\FitnessCentrApp.csproj", "{F85E966A-6E1B-433D-B556-51C82330B525}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitnessCentr", "FitnessCentr\FitnessCentr.csproj", "{7EA047CB-BC2A-4611-ADDC-83ADD26F9FA9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{F85E966A-6E1B-433D-B556-51C82330B525}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F85E966A-6E1B-433D-B556-51C82330B525}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F85E966A-6E1B-433D-B556-51C82330B525}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EA047CB-BC2A-4611-ADDC-83ADD26F9FA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EA047CB-BC2A-4611-ADDC-83ADD26F9FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EA047CB-BC2A-4611-ADDC-83ADD26F9FA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EA047CB-BC2A-4611-ADDC-83ADD26F9FA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

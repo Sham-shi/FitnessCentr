@@ -12,6 +12,8 @@
     Title="Gains and Pains"
     Width="1000"
     Height="700"
+    WindowCornerPreference="Default"
+    WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
     <ui:FluentWindow.InputBindings>
@@ -87,6 +89,7 @@
                     </ui:MenuItem.Icon>
                 </ui:MenuItem>
             </ui:MenuItem>
+            <Separator />
 
             <ui:MenuItem Header="Правка">
                 <ui:MenuItem.Icon>
@@ -121,34 +124,68 @@
                     </ui:MenuItem.Icon>
                 </ui:MenuItem>
             </ui:MenuItem>
+            <Separator />
 
-            <ui:MenuItem Header="Темы">
+            <ui:MenuItem Header="Настройки">
                 <ui:MenuItem.Icon>
-                    <ui:SymbolIcon Symbol="Color24" />
+                    <ui:SymbolIcon Symbol="Settings24" />
                 </ui:MenuItem.Icon>
-                <ui:MenuItem
-                    Name="LightTheme"
-                    Click="LightTheme_Click"
-                    Header="Светлая">
+
+                <ui:MenuItem Header="Темы">
                     <ui:MenuItem.Icon>
-                        <ui:SymbolIcon Symbol="WeatherSunny24" />
+                        <ui:SymbolIcon Symbol="Color24" />
                     </ui:MenuItem.Icon>
+                    <ui:MenuItem
+                        Name="LightTheme"
+                        Click="LightTheme_Click"
+                        Header="Светлая">
+                        <ui:MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="WeatherSunny24" />
+                        </ui:MenuItem.Icon>
+                    </ui:MenuItem>
+                    <ui:MenuItem
+                        Name="DarkTheme"
+                        Click="DarkTheme_Click"
+                        Header="Тёмная">
+                        <ui:MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="WeatherMoon24" />
+                        </ui:MenuItem.Icon>
+                    </ui:MenuItem>
+                    <ui:MenuItem
+                        Name="SystemTheme"
+                        Click="SystemTheme_Click"
+                        Header="Системная">
+                        <ui:MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="Desktop24" />
+                        </ui:MenuItem.Icon>
+                    </ui:MenuItem>
                 </ui:MenuItem>
-                <ui:MenuItem
-                    Name="DarkTheme"
-                    Click="DarkTheme_Click"
-                    Header="Тёмная">
+                <Separator />
+
+                <ui:MenuItem Header="База данных">
                     <ui:MenuItem.Icon>
-                        <ui:SymbolIcon Symbol="WeatherMoon24" />
+                        <ui:SymbolIcon Symbol="Database24" />
                     </ui:MenuItem.Icon>
-                </ui:MenuItem>
-                <ui:MenuItem
-                    Name="SystemTheme"
-                    Click="SystemTheme_Click"
-                    Header="Системная">
-                    <ui:MenuItem.Icon>
-                        <ui:SymbolIcon Symbol="Desktop24" />
-                    </ui:MenuItem.Icon>
+
+                    <ui:MenuItem.DataContext>
+                        <vm:DatabaseSettingsViewModel />
+                    </ui:MenuItem.DataContext>
+
+                    <ui:MenuItem Command="{Binding UseSqliteCommand}" Header="Использовать SQLite" IsCheckable="True">
+                        <ui:MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="DataHistogram24" />
+                        </ui:MenuItem.Icon>
+                    </ui:MenuItem>
+
+                    <ui:MenuItem Command="{Binding UseMssqlCommand}" Header="Использовать MSSQL" IsCheckable="True" >
+                        <ui:MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="DataBarVertical24" />
+                        </ui:MenuItem.Icon>
+                    </ui:MenuItem>
+
+                    <Separator />
+                    <ui:MenuItem Header="{Binding CurrentDatabase, StringFormat=Текущая: {0}}" IsEnabled="False" />
+
                 </ui:MenuItem>
             </ui:MenuItem>
         </Menu>
@@ -158,6 +195,15 @@
             Grid.Row="2"
             Margin="5,10,0,5">
             <TabItem Name="BranchesTab" Header="Филиалы">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Margin="0,0,5,0" Symbol="BuildingMultiple24" />
+                            <TextBlock Text="Филиалы" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:BranchesViewModel />
@@ -166,6 +212,15 @@
             </TabItem>
 
             <TabItem Name="TrainersTab" Header="Тренеры">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Margin="0,0,5,0" Symbol="People24" />
+                            <TextBlock Text="Тренеры" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:TrainersViewModel />
@@ -174,6 +229,15 @@
             </TabItem>
 
             <TabItem Name="ServicesTab" Header="Услуги">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Margin="0,0,5,0" Symbol="ServiceBell24" />
+                            <TextBlock Text="Услуги" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:ServicesViewModel />
@@ -182,6 +246,15 @@
             </TabItem>
 
             <TabItem Name="ClientsTab" Header="Клиенты">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Margin="0,0,5,0" Symbol="PeopleAudience24" />
+                            <TextBlock Text="Клиенты" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:ClientsViewModel />
@@ -190,6 +263,15 @@
             </TabItem>
 
             <TabItem Name="BookingsTab" Header="Записи">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Margin="0,0,5,0" Symbol="CalendarAgenda24 " />
+                            <TextBlock Text="Записи" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:BookingsViewModel />
