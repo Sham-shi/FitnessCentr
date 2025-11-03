@@ -6,6 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:ctk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/communitytoolkit"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -22,7 +24,7 @@
         </Grid.RowDefinitions>
 
         <!--  DataGrid  -->
-        <DataGrid
+        <ui:DataGrid
             x:Name="DataGridAuto"
             Grid.Row="0"
             AutoGenerateColumns="True"
@@ -35,19 +37,27 @@
             SelectedItem="{Binding SelectedItem}" >
             <!--CellEditEnding="DataGridAuto_CellEditEnding"-->
             
-            <DataGrid.ContextMenu>
+            <ui:DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem
+                    <ui:MenuItem
                         Command="{Binding EditCommand}"
                         Header="Редактировать"
-                        IsEnabled="{Binding IsSEditEnabled}" />
-                    <MenuItem
+                        IsEnabled="{Binding IsSEditEnabled}">
+                        <ui:MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="Edit24" />
+                        </ui:MenuItem.Icon>
+                    </ui:MenuItem>
+                    <ui:MenuItem
                         Command="{Binding DeleteCommand}"
                         Header="Удалить"
-                        IsEnabled="{Binding IsSEditEnabled}" />
+                        IsEnabled="{Binding IsSEditEnabled}">
+                        <ui:MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="Delete24" />
+                        </ui:MenuItem.Icon>
+                    </ui:MenuItem>
                 </ContextMenu>
-            </DataGrid.ContextMenu>
-        </DataGrid>
+            </ui:DataGrid.ContextMenu>
+        </ui:DataGrid>
 
         <!--  Кнопки  -->
         <StackPanel
@@ -55,44 +65,44 @@
             Margin="0,10,0,0"
             HorizontalAlignment="Center"
             Orientation="Horizontal">
-            <Button
+            <ui:Button
                 Name="CteateButton"
                 Margin="5"
                 Command="{Binding CreateCommand}"
                 Content="Добавить"
                 IsEnabled="{Binding IsSEditEnabled}" />
-            <Button
+            <ui:Button
                 Name="EditButton"
                 Margin="5"
                 Command="{Binding EditCommand}"
                 Content="Редактировать"
                 IsEnabled="{Binding IsSEditEnabled}" />
-            <Button
+            <ui:Button
                 Name="SaveButton"
                 Margin="5"
                 Command="{Binding SaveCommand}"
                 Content="Сохранить"
                 IsEnabled="{Binding IsSaveEnabled}" />
-            <Button
+            <ui:Button
                 Name="CancelButton"
                 Margin="5"
                 Command="{Binding RefreshCommand}"
                 Content="Отменить"
                 IsEnabled="{Binding IsSaveEnabled}" />
-            <Button
+            <ui:Button
                 Name="DeleteButton"
                 Margin="5"
                 Command="{Binding DeleteCommand}"
                 Content="Удалить"
                 IsEnabled="{Binding IsSEditEnabled}" />
-            <Button
+            <ui:Button
                 Name="RefreshButton"
                 Margin="150,5,5,5"
                 Command="{Binding RefreshCommand}"
                 Content="Обновить список" />
         </StackPanel>
 
-        <StatusBar
+        <ui:InfoBar
             Name="StatusBar"
             Grid.Row="2"
             Height="30"

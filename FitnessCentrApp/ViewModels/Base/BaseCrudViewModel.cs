@@ -1,5 +1,4 @@
-﻿using DbFirst.Models;
-using DbFirst.Services;
+﻿using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
@@ -131,57 +130,6 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
             MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-    //protected override void SaveSelectedItem()
-    //{
-    //    // EditableItem уже приводится к T в родительском классе, но
-    //    // здесь мы хотим быть уверены, что он реализует наш интерфейс.
-    //    if (EditableItem is not T entity || entity.Equals(default(T)))
-    //        return;
-
-    //    try
-    //    {
-    //        using var ctx = DatabaseService.CreateContext();
-
-    //        // Попробуем найти описание сущности в модели EF
-    //        var entityTypeInfo = ctx.Model.FindEntityType(typeof(T));
-    //        if (entityTypeInfo == null)
-    //            throw new InvalidOperationException($"Тип {typeof(T).Name} не зарегистрирован в контексте EF.");
-
-    //        // Находим первичный ключ (например, TrainerID)
-    //        var keyProp = entityTypeInfo.FindPrimaryKey()?.Properties?.FirstOrDefault();
-    //        if (keyProp == null)
-    //            throw new InvalidOperationException($"У типа {typeof(T).Name} не найден первичный ключ.");
-
-    //        var idProp = typeof(T).GetProperty(keyProp.Name);
-    //        if (idProp == null)
-    //            throw new InvalidOperationException($"Свойство первичного ключа '{keyProp.Name}' отсутствует у типа {typeof(T).Name}.");
-
-    //        // Проверяем — новая ли сущность
-    //        var idValue = idProp.GetValue(entity);
-    //        bool isNew = idValue == null
-    //         // Проверяем, является ли ID значением по умолчанию (0 для int, null для nullable)
-    //         || idValue.Equals(Activator.CreateInstance(idProp.PropertyType));
-
-    //        // Устанавливаем состояние и сохраняем
-    //        var entry = ctx.Entry(entity);
-    //        entry.State = isNew ? EntityState.Added : EntityState.Modified;
-
-    //        ctx.SaveChanges();
-
-    //        // Обновляем список, чтобы новый объект получил сгенерированный ID
-    //        Refresh();
-
-    //        IsReadOnly = true;
-    //        EditableItem = null;
-    //        IsSaveEnabled = false;
-
-    //        MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-    //    }
-    //}
 
     protected virtual void EditItem()
     {
