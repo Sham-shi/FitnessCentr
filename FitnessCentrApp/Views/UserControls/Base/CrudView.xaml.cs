@@ -1,8 +1,11 @@
-﻿using FitnessCentrApp.ViewModels.Base;
+﻿using DbFirst.Models;
+using FitnessCentrApp.ViewModels;
+using FitnessCentrApp.ViewModels.Base;
 using FitnessCentrApp.ViewModels.Base.Interfaces;
 using FitnessCentrApp.Views.Helpers;
 using FitnessCentrApp.Views.ValidationRules;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -66,6 +69,9 @@ public partial class CrudView : UserControl
 
             // Подключаем обработчик кликов по строкам
             DataGridAuto.LoadingRow += DataGridAuto_LoadingRow;
+
+            //DataGridAuto.CellEditEnding -= DataGridAuto_CellEditEnding;
+            //DataGridAuto.CellEditEnding += DataGridAuto_CellEditEnding;
         };
     }
 
@@ -205,6 +211,13 @@ public partial class CrudView : UserControl
             return;
         }
 
+        // Общая стоимость только для чтения
+        if (propName.Equals("TotalPrice", StringComparison.OrdinalIgnoreCase))
+        {
+            e.Column.IsReadOnly = true;
+            return;
+        }
+
         // Внешний ключ → создаём ComboBox
         if (propName.EndsWith("ID", StringComparison.OrdinalIgnoreCase))
         {
@@ -276,4 +289,51 @@ public partial class CrudView : UserControl
             return; // Завершаем обработку для этого столбца
         }
     }
+
+    //private void DataGridAuto_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    //{
+    //    // Нам нужно дождаться применения изменений в источник данных
+    //    if (e.EditAction != DataGridEditAction.Commit) return;
+
+    //    // Определяем, какая колонка редактируется
+    //    var columnName = e.Column?.SortMemberPath ?? e.Column?.Header?.ToString();
+    //    if (string.IsNullOrWhiteSpace(columnName))
+    //        return;
+
+    //    // Нас интересуют только ServiceID и SessionsCount
+    //    if (!columnName.Equals("ServiceID", StringComparison.OrdinalIgnoreCase) &&
+    //        !columnName.Equals("SessionsCount", StringComparison.OrdinalIgnoreCase))
+    //        return;
+
+    //    // Попытка получить модель из строки
+    //    var item = e.Row.Item;
+    //    if (item is not Booking booking)
+    //        return;
+
+    //    // Обновляем источник привязки для редактируемого элемента (чтобы значение попало в модель)
+    //    if (e.EditingElement is FrameworkElement fe)
+    //    {
+    //        var binding = BindingOperations.GetBindingExpression(fe, TextBox.TextProperty)
+    //                      ?? BindingOperations.GetBindingExpression(fe, System.Windows.Controls.Primitives.Selector.SelectedValueProperty)
+    //                      ?? BindingOperations.GetBindingExpression(fe, System.Windows.Controls.Primitives.Selector.SelectedItemProperty);
+
+    //        binding?.UpdateSource();
+    //    }
+
+    //    // После выхода из режима редактирования обновляем TotalPrice
+    //    if (DataContext is BookingsViewModel vm)
+    //    {
+    //        Dispatcher.BeginInvoke(new Action(() =>
+    //        {
+    //            try
+    //            {
+    //                vm.RecalculateTotalPrice(booking);
+
+    //                // Обновляем UI после коммита
+    //                CollectionViewSource.GetDefaultView(DataGridAuto.ItemsSource)?.Refresh();
+    //            }
+    //            catch { /* игнорируем безопасно */ }
+    //        }), DispatcherPriority.Background);
+    //    }
+    //}
 }

@@ -4,8 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:FitnessCentrApp.Views.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -16,7 +16,6 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -25,19 +24,34 @@
         <!--  DataGrid  -->
         <DataGrid
             x:Name="DataGridAuto"
-            Grid.Row="1"
+            Grid.Row="0"
             AutoGenerateColumns="True"
             AutoGeneratingColumn="DataGridAuto_AutoGeneratingColumn"
             BeginningEdit="DataGridAuto_BeginningEdit"
             CanUserAddRows="False"
             IsReadOnly="{Binding IsReadOnly}"
             ItemsSource="{Binding Items}"
-            SelectedItem="{Binding SelectedItem}"
-            LoadingRow="DataGridAuto_LoadingRow"/>
+            LoadingRow="DataGridAuto_LoadingRow"
+            SelectedItem="{Binding SelectedItem}" >
+            <!--CellEditEnding="DataGridAuto_CellEditEnding"-->
+            
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Command="{Binding EditCommand}"
+                        Header="Редактировать"
+                        IsEnabled="{Binding IsSEditEnabled}" />
+                    <MenuItem
+                        Command="{Binding DeleteCommand}"
+                        Header="Удалить"
+                        IsEnabled="{Binding IsSEditEnabled}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
 
         <!--  Кнопки  -->
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="1"
             Margin="0,10,0,0"
             HorizontalAlignment="Center"
             Orientation="Horizontal">
@@ -45,32 +59,32 @@
                 Name="CteateButton"
                 Margin="5"
                 Command="{Binding CreateCommand}"
-                IsEnabled="{Binding IsSEditEnabled}"
-                Content="Создать" />
+                Content="Добавить"
+                IsEnabled="{Binding IsSEditEnabled}" />
             <Button
                 Name="EditButton"
                 Margin="5"
                 Command="{Binding EditCommand}"
-                IsEnabled="{Binding IsSEditEnabled}"
-                Content="Редактировать" />
+                Content="Редактировать"
+                IsEnabled="{Binding IsSEditEnabled}" />
             <Button
                 Name="SaveButton"
                 Margin="5"
                 Command="{Binding SaveCommand}"
-                IsEnabled="{Binding IsSaveEnabled}"
-                Content="Сохранить" />
+                Content="Сохранить"
+                IsEnabled="{Binding IsSaveEnabled}" />
             <Button
                 Name="CancelButton"
                 Margin="5"
                 Command="{Binding RefreshCommand}"
-                IsEnabled="{Binding IsSaveEnabled}"
-                Content="Отменить" />
+                Content="Отменить"
+                IsEnabled="{Binding IsSaveEnabled}" />
             <Button
                 Name="DeleteButton"
                 Margin="5"
                 Command="{Binding DeleteCommand}"
-                IsEnabled="{Binding IsSEditEnabled}"
-                Content="Удалить" />
+                Content="Удалить"
+                IsEnabled="{Binding IsSEditEnabled}" />
             <Button
                 Name="RefreshButton"
                 Margin="150,5,5,5"
@@ -78,6 +92,10 @@
                 Content="Обновить список" />
         </StackPanel>
 
-        <StatusBar Name="StatusBar" Grid.Row="3" Height="30" Margin="0 10 0 0"/>
+        <StatusBar
+            Name="StatusBar"
+            Grid.Row="2"
+            Height="30"
+            Margin="0,10,0,0" />
     </Grid>
 </UserControl>

@@ -367,5 +367,4 @@ public static class DataGridDisplayConfig
 
         return CreateComboBoxColumn(propName, serviceTypeItems, "Тип услуги");
     }
-
 }

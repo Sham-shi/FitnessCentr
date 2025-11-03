@@ -77,6 +77,12 @@ namespace FitnessCentrApp.ViewModels
                     string.IsNullOrWhiteSpace(SelectedTrainer.SportsAchievements));
         }
 
+        protected override void Refresh()
+        {
+            base.Refresh();
+            OnPropertyChanged(nameof(SelectedPhoto));
+        }
+
         private void SelectPhoto()
         {
             if (EditableItem is not Trainer trainer)
@@ -161,12 +167,6 @@ namespace FitnessCentrApp.ViewModels
             {
                 return null;
             }
-        }
-
-        protected override void Refresh()
-        {
-            base.Refresh();
-            OnPropertyChanged(nameof(SelectedPhoto));
         }
     }
 }

@@ -6,15 +6,80 @@
     xmlns:local="clr-namespace:FitnessCentrApp"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:v="clr-namespace:FitnessCentrApp.Views.UserControls"
-    xmlns:vm="clr-namespace:FitnessCentrApp.ViewModels"
     xmlns:views="clr-namespace:FitnessCentrApp.Views.UserControls.Base"
+    xmlns:vm="clr-namespace:FitnessCentrApp.ViewModels"
     Title="MainWindow"
     Width="1000"
     Height="600"
-    mc:Ignorable="d"
-    ThemeMode="Light">
+    mc:Ignorable="d">
+
+    <Window.InputBindings>
+        <KeyBinding
+            Key="N"
+            Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.CreateCommand}"
+            Modifiers="Control" />
+        <KeyBinding
+            Key="S"
+            Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.SaveCommand}"
+            Modifiers="Control" />
+        <KeyBinding
+            Key="E"
+            Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.EditCommand}"
+            Modifiers="Control" />
+        <KeyBinding
+            Key="D"
+            Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.DeleteCommand}"
+            Modifiers="Control" />
+        <KeyBinding
+            Key="Z"
+            Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.RefreshCommand}"
+            Modifiers="Control" />
+    </Window.InputBindings>
+
     <Grid>
-        <TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20*" />
+            <RowDefinition Height="380*" />
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="Файл">
+                <MenuItem
+                    Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.CreateCommand}"
+                    Header="Добавить"
+                    InputGestureText="Ctrl+N"
+                    IsEnabled="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.IsSEditEnabled}" />
+                <MenuItem
+                    Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.SaveCommand}"
+                    Header="Сохранить"
+                    InputGestureText="Ctrl+S"
+                    IsEnabled="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.IsSaveEnabled}" />
+                <MenuItem Name="Exit" Header="Выход" InputGestureText="Alt+F4" Click="Exit_Click" />
+            </MenuItem>
+            
+            <MenuItem Header="Правка">
+                <MenuItem
+                    Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.EditCommand}"
+                    Header="Редактировать"
+                    InputGestureText="Ctrl+E"
+                    IsEnabled="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.IsSEditEnabled}" />
+                <MenuItem
+                    Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.DeleteCommand}"
+                    Header="Удалить"
+                    InputGestureText="Ctrl+D"
+                    IsEnabled="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.IsSEditEnabled}" />
+                <MenuItem
+                    Command="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.RefreshCommand}"
+                    Header="Отменить"
+                    InputGestureText="Ctrl+Z"
+                    IsEnabled="{Binding ElementName=MainTabControl, Path=SelectedItem.Content.DataContext.IsSaveEnabled}" />
+            </MenuItem>
+        </Menu>
+        
+        <TabControl
+            x:Name="MainTabControl"
+            Grid.Row="1"
+            Margin="5,0,0,5">
             <TabItem Name="BranchesTab" Header="Филиалы">
                 <views:CrudView>
                     <views:CrudView.DataContext>
@@ -22,28 +87,32 @@
                     </views:CrudView.DataContext>
                 </views:CrudView>
             </TabItem>
-            <TabItem Name="TrainersTab" Header="Тренеры" >
+            
+            <TabItem Name="TrainersTab" Header="Тренеры">
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:TrainersViewModel />
                     </views:CrudView.DataContext>
                 </views:CrudView>
             </TabItem>
-            <TabItem Name="ServicesTab" Header="Услуги" >
+            
+            <TabItem Name="ServicesTab" Header="Услуги">
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:ServicesViewModel />
                     </views:CrudView.DataContext>
                 </views:CrudView>
             </TabItem>
-            <TabItem Name="ClientsTab" Header="Клиенты" >
+            
+            <TabItem Name="ClientsTab" Header="Клиенты">
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:ClientsViewModel />
                     </views:CrudView.DataContext>
                 </views:CrudView>
             </TabItem>
-            <TabItem Name="BookingsTab" Header="Записи" >
+            
+            <TabItem Name="BookingsTab" Header="Записи">
                 <views:CrudView>
                     <views:CrudView.DataContext>
                         <vm:BookingsViewModel />

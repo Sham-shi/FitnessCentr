@@ -39,6 +39,7 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
             booking.ServiceID = Services.FirstOrDefault()?.ServiceID ?? 1;
             booking.TrainerID = Trainers.FirstOrDefault()?.TrainerID ?? 1;
             booking.Status = _validStatuses[0];
+            booking.SessionsCount = 1;
         }
     }
 
@@ -47,8 +48,8 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
         if (EditableItem is not Booking booking)
             return true;
 
-        return string.IsNullOrWhiteSpace(SelectedBooking.Status) ||
-               !_validStatuses.Contains(SelectedBooking.Status);
+        return !_validStatuses.Contains(SelectedBooking.Status) ||
+               booking.SessionsCount <= 0;
     }
 
     protected override void SaveSelectedItem()
@@ -64,6 +65,16 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
             return;
         }
 
+        RecalculateTotalPrice(EditableItem);
+
         base.SaveSelectedItem();
+    }
+
+    public void RecalculateTotalPrice(Booking booking)
+    {
+        if (booking == null) return;
+
+        var service = Services.FirstOrDefault(s => s.ServiceID == booking.ServiceID);
+        booking.TotalPrice = (service?.BasePrice ?? 0m) * booking.SessionsCount;
     }
 }

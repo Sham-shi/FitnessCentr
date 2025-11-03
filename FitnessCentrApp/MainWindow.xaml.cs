@@ -12,4 +12,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
     }
+
+    private void Exit_Click(object sender, RoutedEventArgs e)
+    {
+        this.Close();
+    }
 }

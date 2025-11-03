@@ -115,7 +115,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         {
             using var ctx = DatabaseService.CreateContext();
 
-            // EF Core 6/7: Update() выполняет проверку ID и устанавливает
+            // Update() выполняет проверку ID и устанавливает
             // State = Added, если ID = 0, или State = Modified, если ID > 0.
             // Это заменяет всю логику Reflection и ручной установки State.
             ctx.Set<T>().Update(entity);
@@ -123,10 +123,6 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
             ctx.SaveChanges();
 
             Refresh();
-
-            //IsReadOnly = true; // снова делаем только для чтения
-            //EditableItem = null; // снимаем режим редактирования
-            //IsSaveEnabled = false;
 
             MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
         }
