@@ -1,6 +1,7 @@
 ﻿using DbFirst.Models;
 using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base;
+using FitnessCentrApp.ViewModels.Base.Interfaces;
 using FitnessCentrApp.ViewModels.Services;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -29,12 +30,12 @@ namespace FitnessCentrApp.ViewModels
 
         public BitmapImage? SelectedPhoto => LoadPhoto((EditableItem as Trainer)?.PhotoPath ?? SelectedTrainer?.PhotoPath);
 
-        public RelayCommand SelectPhotoCommand { get; }
+        public AsyncRelayCommand SelectPhotoCommand { get; }
 
         public TrainersViewModel()
         {
             Branches = new ObservableCollection<Branch>(DatabaseService.GetAll<Branch>());
-            SelectPhotoCommand = new RelayCommand(_ => SelectPhoto());
+            SelectPhotoCommand = new AsyncRelayCommand(async _ => await SelectPhoto());
         }
 
         protected override void CreateNewItem()
@@ -44,7 +45,10 @@ namespace FitnessCentrApp.ViewModels
             if (EditableItem is Trainer trainer)
             {
                 trainer.BranchID = Branches.FirstOrDefault()?.BranchID ?? 1;
+                trainer.PhotoPath = "/Photos/Images/default_user.png";
             }
+
+            OnPropertyChanged(nameof(SelectedTrainer));
         }
 
         protected override async Task SaveSelectedItemAsync()
@@ -83,12 +87,11 @@ namespace FitnessCentrApp.ViewModels
             OnPropertyChanged(nameof(SelectedPhoto));
         }
 
-        private void SelectPhoto()
+        private async Task SelectPhoto()
         {
             if (EditableItem is not Trainer trainer)
             {
-                MessageBox.Show("Выберите тренера для добавления фотографии.", "Информация",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                await MessageBoxService.ShowInfoAsync("Информация", "Выберите тренера для добавления фотографии.");
                 return;
             }
 
@@ -111,25 +114,26 @@ namespace FitnessCentrApp.ViewModels
                 var originalFileName = Path.GetFileNameWithoutExtension(fullPath); // "моя_фотка"
                 var fileExtension = Path.GetExtension(fullPath);                   // ".jpg"
 
-                // --- 2. Создаем уникальный суффикс (короткий таймстамп) ---
-                // Формат: "_yyyyMMddHHmmss" или "_ddMMyy_hhmmss"
-                var uniqueSuffix = DateTime.Now.ToString("_yyyyMMddHHmmss");
+                // --- 2. Формируем имя с инкрементальным суффиксом (1), (2)... ---
+                string baseName = originalFileName;
+                int counter = 0;
+                string uniqueFileName = string.Empty;
+                string destPath = string.Empty;
 
-                // --- 3. Формируем новое уникальное имя файла ---
-                // Пример: "моя_фотка_20251101123638.jpg"
-                var uniqueFileName = $"{originalFileName}{uniqueSuffix}{fileExtension}";
+                do
+                {
+                    // Формируем имя: "Имя.ext" или "Имя (1).ext", "Имя (2).ext", и т.д.
+                    if (counter == 0)
+                        uniqueFileName = $"{baseName}{fileExtension}";
+                    else
+                        uniqueFileName = $"{baseName} ({counter}){fileExtension}";
 
-                // --- 4. Создаем путь назначения и копируем файл ---
-                var destPath = Path.Combine(folder, uniqueFileName);
+                    destPath = Path.Combine(folder, uniqueFileName);
+                    counter++;
 
-                // После установки пути обновляем привязку
-                trainer.PhotoPath = $"/Photos/{uniqueFileName}";
-                //trainer.PhotoPath = Path.Combine("Photos", uniqueFileName);
+                } while (File.Exists(destPath)); // Продолжаем, пока файл по пути destPath существует
 
-                // Уведомляем об изменении свойства для обновления UI
-                OnPropertyChanged(nameof(SelectedPhoto));
-                //OnPropertyChanged(nameof(EditableItem));
-
+                // --- 3. Копируем файл и обновляем PhotoPath ---
                 try
                 {
                     // КЛЮЧЕВОЙ ШАГ: КОПИРУЕМ ФАЙЛ С ДИСКА ПОЛЬЗОВАТЕЛЯ В НАШУ ПАПКУ
@@ -137,11 +141,13 @@ namespace FitnessCentrApp.ViewModels
                     File.Copy(dlg.FileName, destPath, true);
                     // Это путь, относительно корня приложения или сервера.
                     trainer.PhotoPath = $"/Photos/{uniqueFileName}";
+
                     OnPropertyChanged(nameof(SelectedPhoto));
+                    OnPropertyChanged(nameof(EditableItem));
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка копирования файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await MessageBoxService.ShowErrorAsync("Ошибка", "Ошибка копирования файла: {ex.Message}");
                 }
             }
         }
@@ -157,6 +163,12 @@ namespace FitnessCentrApp.ViewModels
 
             if (!File.Exists(fullPath))
                 return null;
+
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(fullPath))
+            {
+                // Возвращаем заглушку, если путь пуст или файл не найден.
+                return new BitmapImage(new Uri("pack://application:,,,/FitnessCentrApp;component/Photos/Images/default_user.png"));
+            }
 
             try
             {

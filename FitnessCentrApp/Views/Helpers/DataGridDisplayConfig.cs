@@ -240,50 +240,6 @@ public static class DataGridDisplayConfig
         return column;
     }
 
-
-    //-----------------------------------------------------------------------------------------------------------------
-    //public static DataGridColumn CreatePhotoPathColumn(object? dataContext, string propName)
-    //{
-    //    var templateColumn = new DataGridTemplateColumn
-    //    {
-    //        Header = "Фото"
-    //    };
-
-    //    // --- 1. CellTemplate (Отображение в обычном режиме) ---
-    //    // Этот шаблон простой, его можно оставить с фабриками
-    //    var cellTemplate = new DataTemplate();
-    //    var textFactory = new FrameworkElementFactory(typeof(TextBlock));
-    //    textFactory.SetBinding(TextBlock.TextProperty, new Binding(propName)
-    //    {
-    //        Mode = BindingMode.OneWay
-    //    });
-    //    cellTemplate.VisualTree = textFactory;
-    //    templateColumn.CellTemplate = cellTemplate;
-
-    //    // --- 2. CellEditingTemplate (Отображение в режиме редактирования) ---
-
-    //    // Определяем XAML-шаблон как строку
-    //    string xamlTemplate = $@"
-    //    <DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'
-    //                  xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
-    //        <Grid>
-    //            <Grid.ColumnDefinitions>
-    //                <ColumnDefinition Width='*' />
-    //                <ColumnDefinition Width='Auto' />
-    //            </Grid.ColumnDefinitions>
-    //            <TextBox Grid.Column='0' Text='{{Binding {propName}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}}' />
-    //            <Button Grid.Column='1' Content='Выбрать...' Margin='5,0,0,0' 
-    //                    Command='{{Binding DataContext.SelectPhotoCommand, RelativeSource={{RelativeSource AncestorType={{x:Type DataGrid}}}}}}' />
-    //        </Grid>
-    //    </DataTemplate>";
-
-    //    // Загружаем шаблон из строки XAML
-    //    var editTemplate = (DataTemplate)XamlReader.Parse(xamlTemplate);
-    //    templateColumn.CellEditingTemplate = editTemplate;
-
-    //    return templateColumn;
-    //}
-
     public static DataGridColumn CreateDateInputColumn(string propName, string stringFormat, Type propertyType)
     {
         var templateColumn = new DataGridTemplateColumn();

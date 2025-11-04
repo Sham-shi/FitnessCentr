@@ -99,6 +99,8 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         // 2. Добавляем элемент в коллекцию (начинается асинхронная отрисовка)
         Items.Add(SelectedItem);
 
+        OnPropertyChanged(nameof(SelectedItem));
+
         // 3. Откладываем сигнал для View, чтобы он выполнился после завершения отрисовки DataGrid.
         Application.Current.Dispatcher.BeginInvoke(
             DispatcherPriority.Background, // Низкий приоритет, ждем завершения основного рендеринга
