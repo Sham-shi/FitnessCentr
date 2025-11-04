@@ -168,23 +168,23 @@
                     </ui:MenuItem.Icon>
 
                     <ui:MenuItem.DataContext>
-                        <vm:DatabaseSettingsViewModel />
+                        <vm:MainWindowViewModel />
                     </ui:MenuItem.DataContext>
 
-                    <ui:MenuItem Command="{Binding UseSqliteCommand}" Header="Использовать SQLite" IsCheckable="True">
+                    <ui:MenuItem Command="{Binding UseSqliteCommand}" Header="Использовать SQLite" IsCheckable="True" IsChecked="{Binding IsSqLiteCheked}">
                         <ui:MenuItem.Icon>
                             <ui:SymbolIcon Symbol="DataHistogram24" />
                         </ui:MenuItem.Icon>
                     </ui:MenuItem>
 
-                    <ui:MenuItem Command="{Binding UseMssqlCommand}" Header="Использовать MSSQL" IsCheckable="True" >
+                    <ui:MenuItem Command="{Binding UseMssqlCommand}" Header="Использовать MSSQL" IsCheckable="True" IsChecked="{Binding IsMssqlCheked}">
                         <ui:MenuItem.Icon>
                             <ui:SymbolIcon Symbol="DataBarVertical24" />
                         </ui:MenuItem.Icon>
                     </ui:MenuItem>
 
                     <Separator />
-                    <ui:MenuItem Header="{Binding CurrentDatabase, StringFormat=Текущая: {0}}" IsEnabled="False" />
+                    <ui:MenuItem Header="{Binding CurrentDbType, StringFormat=Текущая: {0}}" IsEnabled="False" />
 
                 </ui:MenuItem>
             </ui:MenuItem>

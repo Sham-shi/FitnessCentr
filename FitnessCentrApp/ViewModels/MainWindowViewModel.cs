@@ -4,8 +4,30 @@ using System.Windows.Input;
 
 namespace FitnessCentrApp.ViewModels;
 
-public class DatabaseSettingsViewModel : BaseViewModel
+public class MainWindowViewModel : BaseViewModel
 {
+    private bool _isSqLiteCheked = true;
+    public bool IsSqLiteCheked
+    {
+        get => _isSqLiteCheked;
+        set
+        {
+            _isSqLiteCheked = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool _isMssqlCheked = false;
+    public bool IsMssqlCheked
+    {
+        get => _isMssqlCheked;
+        set
+        {
+            _isMssqlCheked= value;
+            OnPropertyChanged();
+        }
+    }
+
     // Свойство для получения текущей активной базы данных
     public string CurrentDbType => DatabaseService.CurrentDb;
 
@@ -15,7 +37,7 @@ public class DatabaseSettingsViewModel : BaseViewModel
     // Команда для переключения на SQLite
     public ICommand UseSqliteCommand { get; }
 
-    public DatabaseSettingsViewModel()
+    public MainWindowViewModel()
     {
         UseMssqlCommand = new RelayCommand(
             _ => UseDatabase("MSSQL"),
@@ -35,31 +57,24 @@ public class DatabaseSettingsViewModel : BaseViewModel
             // 1. Попытка смены БД
             DatabaseService.UseDatabase(dbType);
 
+            if (dbType.Equals("SQLite"))
+            {
+                IsSqLiteCheked= true;
+                IsMssqlCheked = false;
+            }
+            else
+            {
+                IsSqLiteCheked= false;
+                IsMssqlCheked = true;
+            }
+
             // 2. Инициализация новой БД (создаст, если еще нет)
             DatabaseService.InitializeDatabase();
             CommandManager.InvalidateRequerySuggested();
+
             // 3. Уведомление об изменении (нужно для обновления галочек/состояния в UI)
             // PropertyChanged должен быть вызван для CurrentDbType, чтобы UI обновился
             OnPropertyChanged(nameof(CurrentDbType));
-
-
-            //Если вам нужна перезагрузка всего приложения после смены,
-            //то после DatabaseService.InitializeDatabase() вызовите:
-            //System.Windows.MessageBox.Show(
-            //$"База данных успешно изменена на {dbType}. Приложение будет перезапущено для применения изменений.",
-            //"Смена базы данных",
-            //System.Windows.MessageBoxButton.OK,
-            //System.Windows.MessageBoxImage.Information);
-
-            //// 1. Получаем полный путь к исполняемому файлу (.exe)
-            //string executablePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-
-            //// 2. Запускаем новый экземпляр приложения
-            //System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(executablePath));
-
-            //// 3. Завершаем текущий экземпляр
-            //System.Windows.Application.Current.Shutdown();
-
         }
         catch (Exception ex)
         {

@@ -1,6 +1,7 @@
 ﻿using DbFirst.Models;
 using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base;
+using FitnessCentrApp.ViewModels.Services;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -52,7 +53,7 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
                booking.SessionsCount <= 0;
     }
 
-    protected override void SaveSelectedItem()
+    protected override async Task SaveSelectedItemAsync()
     {
         if (SelectedBooking == null)
             return;
@@ -60,14 +61,13 @@ public class BookingsViewModel : BaseCrudViewModel<Booking>
         // Проверяем обязательные поля
         if (CheckFilling())
         {
-            MessageBox.Show("Поля Статус и Кол-во занятий обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            await MessageBoxService.ShowErrorAsync("Ошибка", "Поля Статус и Кол-во занятий обязательны для заполнения.");
             return;
         }
-
+        //await MessageBoxService.ShowInfoAsync("Сохранено", "Изменения успешно сохранены!");
         RecalculateTotalPrice(EditableItem);
 
-        base.SaveSelectedItem();
+        await base.SaveSelectedItemAsync();
     }
 
     public void RecalculateTotalPrice(Booking booking)

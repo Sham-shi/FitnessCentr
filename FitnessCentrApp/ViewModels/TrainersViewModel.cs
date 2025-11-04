@@ -1,6 +1,7 @@
 ﻿using DbFirst.Models;
 using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base;
+using FitnessCentrApp.ViewModels.Services;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -46,7 +47,7 @@ namespace FitnessCentrApp.ViewModels
             }
         }
 
-        protected override void SaveSelectedItem()
+        protected override async Task SaveSelectedItemAsync()
         {
             if (SelectedTrainer == null)
                 return;
@@ -54,12 +55,11 @@ namespace FitnessCentrApp.ViewModels
             // Проверяем обязательные поля
             if (CheckFilling())
             {
-                MessageBox.Show("Для заполнения обязательны все поля, кроме Зарплата и Фото.",
-                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                await MessageBoxService.ShowErrorAsync("Ошибка", "Для заполнения обязательны все поля, кроме Зарплата и Фото.");
                 return;
             }
 
-            base.SaveSelectedItem();
+            await base.SaveSelectedItemAsync();
         }
 
         public override bool CheckFilling()

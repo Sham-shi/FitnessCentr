@@ -1,5 +1,6 @@
 ﻿using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base.Interfaces;
+using FitnessCentrApp.ViewModels.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -67,20 +68,20 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
     public event Action<object>? BeginEditRequested;
 
     // Команды
-    public RelayCommand EditCommand { get; }
+    public AsyncRelayCommand EditCommand { get; }
     public RelayCommand CreateCommand { get; }
-    public RelayCommand SaveCommand { get; }
-    public RelayCommand DeleteCommand { get; }
+    public AsyncRelayCommand SaveCommand { get; }
+    public AsyncRelayCommand DeleteCommand { get; }
     public RelayCommand RefreshCommand { get; }
 
     protected BaseCrudViewModel()
     {
         Items = new ObservableCollection<T>();
 
-        EditCommand = new RelayCommand(_ => EditItem(), _ => SelectedItem != null);
+        EditCommand = new AsyncRelayCommand(async _ => await EditItemAsync(), _ => SelectedItem != null);
         CreateCommand = new RelayCommand(_ => CreateNewItem());
-        SaveCommand = new RelayCommand(_ => SaveSelectedItem(), _ => EditableItem != null);
-        DeleteCommand = new RelayCommand(_ => DeleteItem(), _ => SelectedItem != null);
+        SaveCommand = new AsyncRelayCommand(async _ => await SaveSelectedItemAsync(), _ => EditableItem != null);
+        DeleteCommand = new AsyncRelayCommand(async _ => await DeleteItemAsync(), _ => SelectedItem != null);
         RefreshCommand = new RelayCommand(_ => Refresh());
 
         Refresh();
@@ -105,7 +106,7 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         );
     }
 
-    protected virtual void SaveSelectedItem()
+    protected virtual async Task SaveSelectedItemAsync()
     {
         if (EditableItem is not T entity || entity.Equals(default(T)))
             return;
@@ -114,28 +115,27 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         {
             using var ctx = DatabaseService.CreateContext();
 
-            // Update() выполняет проверку ID и устанавливает
-            // State = Added, если ID = 0, или State = Modified, если ID > 0.
-            // Это заменяет всю логику Reflection и ручной установки State.
             ctx.Set<T>().Update(entity);
 
             ctx.SaveChanges();
 
             Refresh();
 
-            MessageBox.Show("Изменения сохранены!", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
+            await MessageBoxService.ShowInfoAsync("Сохранено", "Изменения успешно сохранены!");
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            await MessageBoxService.ShowErrorAsync("Ошибка при сохранении", ex.Message);
+
+            Refresh();
         }
     }
 
-    protected virtual void EditItem()
+    protected virtual async Task EditItemAsync()
     {
         if (SelectedItem == null)
         {
-            MessageBox.Show("Сначала выберите элемент для редактирования.");
+            await MessageBoxService.ShowWarningAsync("Редактирование", "Сначала выберите элемент для редактирования.");
             return;
         }
 
@@ -148,26 +148,32 @@ public abstract class BaseCrudViewModel<T> : BaseViewModel, IEditableViewModel, 
         BeginEditRequested?.Invoke(SelectedItem);
     }
 
-    protected virtual void DeleteItem()
+    protected virtual async Task DeleteItemAsync()
     {
         if (SelectedItem == null)
             return;
+        bool confirm = await MessageBoxService.ShowConfirmAsync(
+            "Подтверждение удаления",
+            "Вы уверены, что хотите удалить выбранную запись?"
+        );
 
-        if (MessageBox.Show("Вы уверены, что хотите удалить запись?",
-            "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+        if(!confirm) return;
+
+        try
         {
-            try
-            {
-                using var ctx = DatabaseService.CreateContext();
-                ctx.Set<T>().Remove(SelectedItem);
-                ctx.SaveChanges();
+            using var ctx = DatabaseService.CreateContext();
+            ctx.Set<T>().Remove(SelectedItem);
+            await ctx.SaveChangesAsync();
 
-                Refresh();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            Refresh();
+
+            await MessageBoxService.ShowInfoAsync("Удалено", "Запись успешно удалена.");
+        }
+        catch (Exception ex)
+        {
+            await MessageBoxService.ShowErrorAsync("Ошибка при удалении", ex.Message);
+
+            Refresh();
         }
     }
 

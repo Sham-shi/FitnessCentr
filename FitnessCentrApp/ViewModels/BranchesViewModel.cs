@@ -1,5 +1,6 @@
 ﻿using DbFirst.Models;
 using FitnessCentrApp.ViewModels.Base;
+using FitnessCentrApp.ViewModels.Services;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -26,7 +27,7 @@ public class BranchesViewModel : BaseCrudViewModel<Branch>
                 string.IsNullOrWhiteSpace(SelectedBranch.Email);
     }
 
-    protected override void SaveSelectedItem()
+    protected override async Task SaveSelectedItemAsync()
     {
         if (SelectedBranch == null)
             return;
@@ -34,11 +35,10 @@ public class BranchesViewModel : BaseCrudViewModel<Branch>
         // Проверяем обязательные поля
         if (CheckFilling())
         {
-            MessageBox.Show("Все поля обязательны для заполнения.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            await MessageBoxService.ShowErrorAsync("Ошибка", "Все поля обязательны для заполнения.");
             return;
         }
 
-        base.SaveSelectedItem();
+        await base.SaveSelectedItemAsync();
     }
 }
