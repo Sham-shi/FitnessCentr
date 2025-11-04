@@ -35,7 +35,8 @@
             IsReadOnly="{Binding IsReadOnly}"
             ItemsSource="{Binding Items}"
             LoadingRow="DataGridAuto_LoadingRow"
-            SelectedItem="{Binding SelectedItem}">
+            SelectedItem="{Binding SelectedItem}"
+            GridLinesVisibility="All">
 
             <DataGrid.ContextMenu>
                 <ContextMenu>
