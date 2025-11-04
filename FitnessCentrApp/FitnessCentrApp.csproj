@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Photos\**" />
+    <EmbeddedResource Remove="Photos\**" />
+    <None Remove="Photos\**" />
+    <Page Remove="Photos\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="appsettings.json" />
   </ItemGroup>
 
@@ -20,10 +27,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DbFirst\DbFirst.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Photos\" />
   </ItemGroup>
 
   <ItemGroup>

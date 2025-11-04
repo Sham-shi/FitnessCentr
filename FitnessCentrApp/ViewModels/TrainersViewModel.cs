@@ -122,6 +122,14 @@ namespace FitnessCentrApp.ViewModels
                 // --- 4. Создаем путь назначения и копируем файл ---
                 var destPath = Path.Combine(folder, uniqueFileName);
 
+                // После установки пути обновляем привязку
+                trainer.PhotoPath = $"/Photos/{uniqueFileName}";
+                //trainer.PhotoPath = Path.Combine("Photos", uniqueFileName);
+
+                // Уведомляем об изменении свойства для обновления UI
+                OnPropertyChanged(nameof(SelectedPhoto));
+                //OnPropertyChanged(nameof(EditableItem));
+
                 try
                 {
                     // КЛЮЧЕВОЙ ШАГ: КОПИРУЕМ ФАЙЛ С ДИСКА ПОЛЬЗОВАТЕЛЯ В НАШУ ПАПКУ
