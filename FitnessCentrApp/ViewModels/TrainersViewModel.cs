@@ -1,7 +1,6 @@
 ﻿using DbFirst.Models;
 using DbFirst.Services;
 using FitnessCentrApp.ViewModels.Base;
-using FitnessCentrApp.ViewModels.Base.Interfaces;
 using FitnessCentrApp.ViewModels.Services;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace FitnessCentrApp.ViewModels.Base.Interfaces;
+namespace FitnessCentrApp.ViewModels.Base;
 
 public class AsyncRelayCommand : ICommand
 {
